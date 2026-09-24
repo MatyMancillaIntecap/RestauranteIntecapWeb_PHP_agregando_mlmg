@@ -15,7 +15,15 @@ class SmtpMailer
     private string $usuario;
     private string $contrasena;
 
-    /** Guarda los datos de conexion del servidor SMTP. */
+    /**
+     * Guarda los datos de conexión del servidor SMTP.
+     *
+     * @param string $host Host SMTP configurado.
+     * @param int $puerto Puerto SMTP, normalmente 465 o 587.
+     * @param bool $usarSsl Indica si se debe negociar TLS.
+     * @param string $usuario Usuario SMTP.
+     * @param string $contrasena Contraseña SMTP.
+     */
     public function __construct(string $host, int $puerto, bool $usarSsl, string $usuario, string $contrasena)
     {
         $this->host = $host;
@@ -27,6 +35,11 @@ class SmtpMailer
 
     /**
      * Envia un correo HTML.
+     *
+     * @return array{0: bool, 1: string} Resultado y mensaje para la interfaz.
+     */
+    /**
+     * Envía un correo HTML mediante el protocolo SMTP.
      *
      * @return array{0: bool, 1: string} Resultado y mensaje para la interfaz.
      */

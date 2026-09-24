@@ -7,10 +7,20 @@ declare(strict_types=1);
  * respetando la carpeta publica donde Apache ejecuto el front controller.
  */
 
-// Router mínimo: traduce /controlador/accion/param en una invocación de método PHP
+/**
+ * Resuelve las URL de la aplicación y ejecuta el controlador correspondiente.
+ *
+ * Equivale al enrutamiento MVC del proyecto original en C#, adaptado al
+ * front controller PHP ubicado en public/index.php.
+ */
 class Router
 {
-    /** Analiza la URL, carga el controlador y ejecuta la accion solicitada. */
+    /**
+     * Analiza la URL, carga el controlador y ejecuta la acción solicitada.
+     *
+     * Devuelve respuestas 404 directamente cuando la clase, archivo o método
+     * solicitado no existe.
+     */
     public function dispatch(): void
     {
         $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
@@ -63,7 +73,12 @@ class Router
         call_user_func_array([$controller, $actionMethod], $params);
     }
 
-    /** Convierte segmentos kebab-case o snake_case a camelCase. */
+    /**
+     * Convierte segmentos kebab-case o snake_case a camelCase.
+     *
+     * @param string $segment Segmento recibido desde la URL.
+     * @return string Nombre de método o controlador en camelCase.
+     */
     private function toCamelCase(string $segment): string
     {
         $segment = str_replace(['-', '_'], ' ', $segment);

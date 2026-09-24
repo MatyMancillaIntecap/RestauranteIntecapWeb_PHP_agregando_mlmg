@@ -163,7 +163,6 @@ class EmpleadoController extends Controller
         }
 
         $pdf = new PdfWriter('Mi Historial de Reservas');
-        $pdf->addLine('Restaurante Escuela INTECAP');
         $pdf->addLine('Periodo: ' . ($fechaInicio ?: 'Todos') . ' al ' . ($fechaFin ?: 'Todos') . ' · Generado: ' . date('d/m/Y H:i'));
         $pdf->setSummary([
             'Reservas' => (string) count($historial),

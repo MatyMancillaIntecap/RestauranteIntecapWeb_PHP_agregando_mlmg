@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 // Se usan como contenedores de datos (arrays asociativos convertidos a objetos) entre los Services y las Vistas.
 
+/** Representa un rol y su límite diario de almuerzos. */
 class Rol
 {
     public int $id = 0;
@@ -28,6 +29,7 @@ class Rol
     }
 }
 
+/** Representa una cuenta autenticable y sus datos administrativos. */
 class Usuario
 {
     public int $id = 0;
@@ -57,6 +59,7 @@ class Usuario
     }
 }
 
+/** Representa una forma de pago disponible para una reserva. */
 class FormaPago
 {
     public int $id = 0;
@@ -72,6 +75,7 @@ class FormaPago
     }
 }
 
+/** Representa un platillo publicado para una fecha concreta. */
 class MenuDiario
 {
     public int $id = 0;
@@ -105,6 +109,7 @@ class MenuDiario
     }
 }
 
+/** Representa una reserva de uno o varios almuerzos. */
 class Reserva
 {
     public int $id = 0;
@@ -136,6 +141,7 @@ class Reserva
     }
 }
 
+/** Representa un registro de auditoría de inicio de sesión. */
 class HistorialLogin
 {
     public int $id = 0;
@@ -143,6 +149,7 @@ class HistorialLogin
     public string $fecha_login = '';
 }
 
+/** Representa una solicitud de recuperación de contraseña. */
 class SolicitudRestablecimientoPassword
 {
     public int $id = 0;

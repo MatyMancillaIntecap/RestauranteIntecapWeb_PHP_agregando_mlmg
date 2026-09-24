@@ -33,12 +33,16 @@ class ExcelWriter
     private int $fitToWidth = 1;
     private int $fitToHeight = 1;
     private array $pageMargins = [];
+    /** @var int[] Índices de columnas numéricas que deben mostrarse sin decimales. */
+    private array $integerColumns = [];
 
+    /** Define el nombre visible de la hoja de cálculo. */
     public function setSheetName(string $name): void
     {
         $this->sheetName = $name;
     }
 
+    /** Define el color hexadecimal del encabezado de la tabla. */
     public function setHeaderColor(string $hexColor): void
     {
         $this->headerColor = strtoupper(ltrim($hexColor, '#'));
@@ -77,11 +81,23 @@ class ExcelWriter
         $this->pageMargins = compact('left', 'right', 'top', 'bottom');
     }
 
+    /**
+     * Configura columnas numéricas con formato entero, sin cambiar sus valores.
+     *
+     * @param int[] $columns Índices zero-based de las columnas enteras.
+     */
+    public function setIntegerColumns(array $columns): void
+    {
+        $this->integerColumns = array_values(array_unique(array_map('intval', $columns)));
+    }
+
+    /** Define el título superior del reporte. */
     public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
+    /** Define el subtítulo contextual mostrado debajo del título. */
     public function setSubtitle(string $subtitle): void
     {
         $this->subtitle = $subtitle;
@@ -93,16 +109,19 @@ class ExcelWriter
         $this->widths = array_values($widths);
     }
 
+    /** @param array<int,string> $headers Etiquetas de las columnas. */
     public function setHeaders(array $headers): void
     {
         $this->headers = array_values($headers);
     }
 
+    /** @param array<int,mixed> $row Valores de una fila en el mismo orden de los encabezados. */
     public function addRow(array $row): void
     {
         $this->rows[] = array_values($row);
     }
 
+    /** @param array<int,array<int,mixed>> $rows Filas que se agregan al reporte. */
     public function addRows(array $rows): void
     {
         foreach ($rows as $row) {
@@ -116,7 +135,7 @@ class ExcelWriter
         $this->totalRow = array_values($row);
     }
 
-    /** Devuelve los bytes del archivo .xlsx */
+    /** @return string Bytes binarios de un archivo XLSX Open XML válido. */
     public function generate(): string
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'xlsx_');
@@ -142,11 +161,13 @@ class ExcelWriter
 
     // ─── Helpers ────────────────────────────────────────────────────────────
 
+    /** Escapa texto para insertarlo de forma segura en XML. */
     private function xe(string $v): string
     {
         return htmlspecialchars($v, ENT_XML1 | ENT_QUOTES, 'UTF-8');
     }
 
+    /** Convierte un índice cero-based en una letra o combinación de Excel. */
     private function colLetter(int $col): string
     {
         $letters = '';
@@ -174,6 +195,7 @@ class ExcelWriter
 
     // ─── Partes del OOXML ───────────────────────────────────────────────────
 
+    /** Genera el manifiesto de tipos de contenido del paquete XLSX. */
     private function contentTypes(): string
     {
         return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -193,6 +215,7 @@ class ExcelWriter
 </Types>';
     }
 
+    /** Genera las relaciones del paquete raíz con el libro de Excel. */
     private function rootRels(): string
     {
         return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -204,6 +227,7 @@ class ExcelWriter
 </Relationships>';
     }
 
+    /** Genera el XML del libro y su hoja principal. */
     private function workbook(): string
     {
         $name = $this->xe($this->sheetName);
@@ -216,6 +240,7 @@ class ExcelWriter
 </workbook>';
     }
 
+    /** Genera las relaciones entre libro, hoja, estilos y cadenas compartidas. */
     private function workbookRels(): string
     {
         return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -276,7 +301,7 @@ class ExcelWriter
   <cellStyleXfs count="1">
     <xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>
   </cellStyleXfs>
-    <cellXfs count="12">
+    <cellXfs count="14">
     <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
     <xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
     <xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0"><alignment vertical="center"/></xf>
@@ -286,6 +311,8 @@ class ExcelWriter
     <xf numFmtId="4" fontId="0" fillId="3" borderId="1" xfId="0"><alignment horizontal="right" vertical="center"/></xf>
     <xf numFmtId="4" fontId="0" fillId="4" borderId="1" xfId="0"><alignment horizontal="right" vertical="center"/></xf>
     <xf numFmtId="0" fontId="4" fillId="5" borderId="1" xfId="0"><alignment vertical="center"/></xf>
+    <xf numFmtId="1" fontId="0" fillId="3" borderId="1" xfId="0"><alignment horizontal="right" vertical="center"/></xf>
+    <xf numFmtId="1" fontId="0" fillId="4" borderId="1" xfId="0"><alignment horizontal="right" vertical="center"/></xf>
     <xf numFmtId="4" fontId="4" fillId="5" borderId="1" xfId="0"><alignment horizontal="right" vertical="center"/></xf>
         <xf numFmtId="0" fontId="5" fillId="6" borderId="1" xfId="0"><alignment horizontal="center" vertical="center"/></xf>
         <xf numFmtId="0" fontId="6" fillId="7" borderId="1" xfId="0"><alignment horizontal="center" vertical="center"/></xf>
@@ -293,29 +320,49 @@ class ExcelWriter
 </styleSheet>';
     }
 
+    /** @return string[] Cadenas que se almacenarán en sharedStrings.xml. */
     private function collectStrings(): array
     {
         $strings = [];
+        $seen = [];
+
+        // sharedStrings.xml debe conservar el mismo índice único que buildStringIndex().
         foreach ($this->headers as $h) {
-            $strings[] = (string) $h;
+            $key = '__HDR__' . $h;
+            if (!array_key_exists($key, $seen)) {
+                $seen[$key] = true;
+                $strings[] = (string) $h;
+            }
         }
+
         foreach ($this->rows as $row) {
             foreach ($row as $cell) {
                 if (!is_numeric($cell) || $cell === '') {
-                    $strings[] = (string) $cell;
+                    $key = (string) $cell;
+                    if (!array_key_exists($key, $seen)) {
+                        $seen[$key] = true;
+                        $strings[] = $key;
+                    }
                 }
             }
         }
+
         if ($this->totalRow !== null) {
             foreach ($this->totalRow as $cell) {
                 if (!is_numeric($cell) || $cell === '') {
-                    $strings[] = (string) $cell;
+                    $key = (string) $cell;
+                    if (!array_key_exists($key, $seen)) {
+                        $seen[$key] = true;
+                        $strings[] = $key;
+                    }
                 }
             }
         }
+
         return $strings;
     }
 
+    /** Genera la tabla de cadenas compartidas requerida por Open XML. */
     private function sharedStrings(): string
     {
         $strings = $this->collectStrings();
@@ -331,6 +378,7 @@ class ExcelWriter
         return $xml;
     }
 
+    /** @return array<string,int> Índices XML de cada cadena utilizada. */
     private function buildStringIndex(): array
     {
         $strIndex = [];
@@ -364,17 +412,22 @@ class ExcelWriter
         return $strIndex;
     }
 
+    /** Genera una celda XML numérica o referenciada a sharedStrings.xml. */
     private function writeDataCell(int $ci, int $rowNum, $cell, string $textStyle, string $numStyle, array $strIndex): string
     {
         $cellRef = $this->colLetter($ci) . $rowNum;
         if (is_numeric($cell) && $cell !== '') {
-            return '  <c r="' . $cellRef . '" s="' . $numStyle . '"><v>' . $this->xe((string) $cell) . '</v></c>' . "\n";
+            $numericStyle = in_array($ci, $this->integerColumns, true)
+                ? ($textStyle === '4' ? '12' : '13')
+                : $numStyle;
+            return '  <c r="' . $cellRef . '" s="' . $numericStyle . '"><v>' . $this->xe((string) $cell) . '</v></c>' . "\n";
         }
         $siIdx = $strIndex[(string) $cell] ?? 0;
         $style = $cell === '✔' ? ($textStyle === '4' ? '10' : '11') : $textStyle;
         return '  <c r="' . $cellRef . '" t="s" s="' . $style . '"><v>' . $siIdx . '</v></c>' . "\n";
     }
 
+    /** Genera la hoja, estilos de filas, filtro y configuración de impresión. */
     private function sheet(): string
     {
         $strIndex = $this->buildStringIndex();
@@ -465,6 +518,7 @@ class ExcelWriter
         return $xml;
     }
 
+    /** Genera metadatos mínimos del documento XLSX. */
     private function appProps(): string
     {
         return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>

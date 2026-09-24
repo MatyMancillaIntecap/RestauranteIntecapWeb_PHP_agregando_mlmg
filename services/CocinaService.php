@@ -19,8 +19,17 @@ class CocinaService
     /** Devuelve los platillos publicados para una fecha. */
     public function obtenerMenusPorFecha(string $fecha): array
     {
-        $stmt = $this->db->prepare('SELECT * FROM menu_diario WHERE fecha = :fecha');
-        $stmt->execute(['fecha' => $fecha]);
+        $stmt = $this->db->prepare(
+            'SELECT *
+             FROM menu_diario
+             WHERE fecha = :fecha_menu
+               AND DATE(hora_habilitacion) = :fecha_vigencia
+             ORDER BY hora_habilitacion ASC, nombre_plato ASC'
+        );
+        $stmt->execute([
+            'fecha_menu' => $fecha,
+            'fecha_vigencia' => $fecha,
+        ]);
         return $stmt->fetchAll();
     }
 

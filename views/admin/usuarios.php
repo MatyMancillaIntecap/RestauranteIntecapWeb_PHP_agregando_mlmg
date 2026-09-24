@@ -57,13 +57,13 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-3"># ID</th>
                             <th>Nombre Completo</th>
                             <th>Correo Electrónico</th>
                             <th>Rol</th>
                             <th>Límite Almuerzos</th>
                             <th>NIT Facturación</th>
                             <th>Estado</th>
+                            <th class="text-center pe-3">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -76,7 +76,6 @@
                         <?php endif; ?>
                         <?php foreach ($usuarios as $u): ?>
                             <tr id="fila-usuario-<?= (int)$u['id'] ?>">
-                                <td class="ps-3"><strong>#<?= (int)$u['id'] ?></strong></td>
                                 <td>
                                     <div class="fw-bold"><?= htmlspecialchars($u['nombre']) ?></div>
                                 </td>
@@ -111,6 +110,24 @@
                                             <?= $u['activo'] ? 'Activo' : 'Inactivo' ?>
                                         </label>
                                     </div>
+                                </td>
+                                <td class="text-center pe-3">
+                                    <a href="<?= BASE_URL ?>/admin/detalle-usuario/<?= (int)$u['id'] ?>"
+                                       class="btn btn-sm btn-outline-info me-1 fw-bold" title="Ver Ficha Completa">
+                                        🔍 Detalle
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-primary fw-bold"
+                                            onclick="abrirModalEditarUsuario(<?= (int)$u['id'] ?>)"
+                                            title="Editar Usuario">
+                                        ✏️ Editar
+                                    </button>
+                                    <?php if ((int) $u['id'] !== Auth::id()): ?>
+                                        <button class="btn btn-sm btn-outline-danger fw-bold ms-1"
+                                                onclick="eliminarUsuario(<?= (int)$u['id'] ?>)"
+                                                title="Eliminar Usuario">
+                                            🗑️ Eliminar
+                                        </button>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

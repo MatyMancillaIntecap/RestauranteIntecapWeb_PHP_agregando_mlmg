@@ -304,7 +304,6 @@ class AdminController extends Controller
         }
 
         $pdf = new PdfWriter('Reporte Global de Reservas');
-        $pdf->addLine('Restaurante Escuela INTECAP');
         $pdf->addLine('Generado: ' . date('d/m/Y H:i'));
         $pdf->addLine('Periodo: ' . ($fechaInicio ? date('d/m/Y', strtotime($fechaInicio)) : 'Todos')
             . ' al ' . ($fechaFin ? date('d/m/Y', strtotime($fechaFin)) : 'Todos'));
@@ -329,39 +328,26 @@ class AdminController extends Controller
     public function descargarUsuariosExcel(): void
     {
         $usuarios = $this->adminService->obtenerTodosLosUsuarios();
-        $activos = count(array_filter($usuarios, static fn ($u) => (bool) $u['activo']));
 
         $writer = new ExcelWriter();
         $writer->setSheetName('Usuarios');
-        $writer->setTitle('PADRÓN DE USUARIOS DEL SISTEMA');
-        $writer->setSubtitle('Restaurante Escuela INTECAP · Generado: ' . date('d/m/Y H:i'));
+        $writer->setTitle('GESTIÓN GENERAL DE USUARIOS');
+        $writer->setSubtitle('Administra accesos, roles, estados, límites de platillos y NITs del personal.');
         $writer->setHeaderColor('0D6EFD');
-        $writer->setColumnWidths([8, 26, 30, 16, 12, 16, 12, 18]);
-        $writer->setHeaders(['#ID', 'Nombre', 'Correo', 'Rol', 'Estado', 'Límite Almuerzos', 'NIT', 'Fecha Creación']);
+        $writer->setColumnWidths([30, 34, 18, 18, 14, 14]);
+        $writer->setHeaders(['Nombre Completo', 'Correo Electrónico', 'Rol', 'Límite Almuerzos', 'NIT Facturación', 'Estado']);
+        $writer->setIntegerColumns([]);
 
         foreach ($usuarios as $u) {
             $writer->addRow([
-                (int) $u['id'],
                 (string) $u['nombre'],
                 (string) $u['email'],
                 (string) $u['nombre_rol'],
-                $u['activo'] ? 'Activo' : 'Inactivo',
-                (int) $u['max_almuerzos'] === 0 ? 'Ilimitado' : (int) $u['max_almuerzos'],
+                (int) $u['max_almuerzos'] === 0 ? 'Ilimitado' : (int) $u['max_almuerzos'] . ' / día',
                 (string) $u['nit_facturacion'],
-                (string) $u['fecha_creacion'],
+                $u['activo'] ? 'Activo' : 'Inactivo',
             ]);
         }
-
-        $writer->setTotalRow([
-            'TOTAL',
-            count($usuarios) . ' usuarios',
-            '',
-            '',
-            $activos . ' activos / ' . (count($usuarios) - $activos) . ' inactivos',
-            '',
-            '',
-            '',
-        ]);
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="Usuarios_Sistema_' . date('Ymd') . '.xlsx"');
@@ -376,7 +362,6 @@ class AdminController extends Controller
         $activos = count(array_filter($usuarios, static fn ($u) => (bool) $u['activo']));
 
         $pdf = new PdfWriter('Padrón de Usuarios del Sistema');
-        $pdf->addLine('Restaurante Escuela INTECAP');
         $pdf->addLine('Generado: ' . date('d/m/Y H:i'));
         $pdf->setSummary([
             'Total de usuarios' => (string) count($usuarios),

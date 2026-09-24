@@ -9,7 +9,13 @@ declare(strict_types=1);
 
 abstract class Controller
 {
-    /** Renderiza una vista con datos y, opcionalmente, el layout comun. */
+    /**
+     * Renderiza una vista con datos y, opcionalmente, el layout común.
+     *
+     * @param string $view Ruta relativa dentro de views sin extensión.
+     * @param array<string,mixed> $data Variables expuestas a la vista.
+     * @param bool $useLayout Indica si debe envolverse en views/layout.php.
+     */
     protected function render(string $view, array $data = [], bool $useLayout = true): void
     {
         extract($data);
@@ -32,7 +38,12 @@ abstract class Controller
         require ROOT_PATH . '/views/layout.php';
     }
 
-    /** Envia una respuesta JSON y termina la solicitud. */
+    /**
+     * Envía una respuesta JSON y termina la solicitud.
+     *
+     * @param mixed $data Payload serializable a JSON.
+     * @param int $status Código HTTP de respuesta.
+     */
     protected function json($data, int $status = 200): void
     {
         http_response_code($status);
@@ -41,14 +52,14 @@ abstract class Controller
         exit;
     }
 
-    /** Redirige a una ruta interna relativa a BASE_URL. */
+    /** @param string $path Ruta interna relativa a BASE_URL. */
     protected function redirect(string $path): void
     {
         header('Location: ' . BASE_URL . '/' . ltrim($path, '/'));
         exit;
     }
 
-    /** Lee un parametro priorizando POST sobre GET. */
+    /** @param string $key Nombre del parámetro; POST tiene prioridad sobre GET. */
     protected function input(string $key, $default = null)
     {
         return $_POST[$key] ?? $_GET[$key] ?? $default;

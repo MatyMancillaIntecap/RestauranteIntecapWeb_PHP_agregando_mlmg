@@ -34,6 +34,7 @@ class PdfWriter
         $this->lines[] = $line;
     }
 
+    /** @param array<int,string> $lines Líneas que se agregarán en orden. */
     public function addLines(array $lines): void
     {
         foreach ($lines as $line) {
@@ -41,7 +42,13 @@ class PdfWriter
         }
     }
 
-    /** Define la tabla principal del reporte. */
+    /**
+     * Define la tabla principal del reporte.
+     *
+     * @param array<int,string> $headers Encabezados visibles.
+     * @param array<int,array<int,mixed>> $rows Filas tabulares.
+     * @param float[] $widths Anchos PDF cuya suma debe caber en la página.
+     */
     public function setTable(array $headers, array $rows, array $widths = []): void
     {
         $this->table = ['headers' => $headers, 'rows' => $rows, 'widths' => $widths];
@@ -57,7 +64,7 @@ class PdfWriter
         $this->columnAlignments = $alignments;
     }
 
-    /** Define un resumen clave/valor mostrado antes de la tabla. */
+    /** @param array<string,string> $summary Indicadores mostrados antes de la tabla. */
     public function setSummary(array $summary): void
     {
         $this->summary = $summary;
@@ -160,7 +167,7 @@ class PdfWriter
             $this->drawTableHeader($headers, $widths);
 
             foreach ($rows as $i => $row) {
-                if ($this->y < 70) {
+                if ($this->y - $this->rowHeight($row, $headers, $widths) < 70) {
                     $this->flushPage();
                     $this->drawPageHeader();
                     $this->drawTableHeader($headers, $widths);
@@ -193,6 +200,7 @@ class PdfWriter
         unset($page);
     }
 
+    /** Dibuja la franja superior con el título del documento. */
     private function drawHeaderBar(): void
     {
         $this->rect(0, 792, 595, 50, '0.12 0.24 0.42');
@@ -207,6 +215,7 @@ class PdfWriter
         $this->y = 762;
     }
 
+    /** Dibuja encabezados de tabla y avanza el cursor vertical. */
     private function drawTableHeader(array $headers, array $widths): void
     {
         $x = 36;
@@ -221,7 +230,7 @@ class PdfWriter
 
     private function drawTableRow(array $row, array $headers, array $widths, bool $band): void
     {
-        $rowHeight = 20;
+        $rowHeight = $this->rowHeight($row, $headers, $widths);
         $x = 36;
         if ($band) {
             $this->rect($x, $this->y - $rowHeight, array_sum($widths), $rowHeight, '0.95 0.96 0.97');
@@ -229,16 +238,61 @@ class PdfWriter
         foreach ($headers as $i => $_header) {
             $value = (string) ($row[$i] ?? '');
             $alignment = $this->columnAlignments[$i] ?? 'left';
-            $this->textAligned($x, $this->y - 14, 8, $value, $widths[$i], $alignment);
+            foreach ($this->wrapText($value, $widths[$i]) as $lineIndex => $line) {
+                $this->textAligned($x, $this->y - 14 - ($lineIndex * 9), 8, $line, $widths[$i], $alignment, false);
+            }
             $x += $widths[$i];
         }
         $this->y -= $rowHeight;
     }
 
-    /** Dibuja una celda de tabla respetando el ancho y la alineación configurada. */
-    private function textAligned(float $x, float $y, int $size, string $value, float $width, string $alignment): void
+    /** Calcula la altura necesaria para mostrar todas las líneas de una fila. */
+    private function rowHeight(array $row, array $headers, array $widths): float
     {
-        $value = $this->truncate($value, max(6, (int) ($width / 4.3)));
+        $lineCount = 1;
+        foreach ($headers as $i => $_header) {
+            $lineCount = max($lineCount, count($this->wrapText((string) ($row[$i] ?? ''), $widths[$i])));
+        }
+
+        return max(20, 8 + ($lineCount * 9));
+    }
+
+    /**
+     * Divide un texto por palabras para que ocupe varias líneas sin perder contenido.
+     *
+     * @return string[] Líneas ajustadas al ancho aproximado de la columna.
+     */
+    private function wrapText(string $value, float $width): array
+    {
+        $limit = max(6, (int) ($width / 4.3));
+        $paragraphs = preg_split('/\r\n|\r|\n/', $value) ?: [''];
+        $lines = [];
+
+        foreach ($paragraphs as $paragraph) {
+            $words = preg_split('/\s+/', trim($paragraph)) ?: [''];
+            $line = '';
+            foreach ($words as $word) {
+                if ($word === '') {
+                    continue;
+                }
+                if ($line !== '' && strlen($line . ' ' . $word) > $limit) {
+                    $lines[] = $line;
+                    $line = '';
+                }
+                $line .= ($line === '' ? '' : ' ') . $word;
+            }
+            $lines[] = $line;
+        }
+
+        return $lines === [] ? [''] : $lines;
+    }
+
+    /** Dibuja una celda de tabla respetando el ancho y la alineación configurada. */
+    private function textAligned(float $x, float $y, int $size, string $value, float $width, string $alignment, bool $truncate = true): void
+    {
+        if ($truncate) {
+            $value = $this->truncate($value, max(6, (int) ($width / 4.3)));
+        }
         $estimatedWidth = strlen($value) * $size * 0.48;
         $textX = match ($alignment) {
             'right' => $x + $width - $estimatedWidth - 4,
@@ -248,17 +302,20 @@ class PdfWriter
         $this->text(max($x + 2, $textX), $y, $size, $value);
     }
 
+    /** Añade una instrucción de texto al flujo PDF actual. */
     private function text(float $x, float $y, int $size, string $value, bool $bold = false, string $color = '0.12 0.16 0.19'): void
     {
         $font = $bold ? 'F2' : 'F1';
         $this->buf .= "BT\n{$color} rg\n/{$font} {$size} Tf\n{$x} {$y} Td\n(" . $this->escapePdf($value) . ") Tj\nET\n";
     }
 
+    /** Añade un rectángulo relleno al flujo PDF actual. */
     private function rect(float $x, float $y, float $width, float $height, string $color): void
     {
         $this->buf .= "q\n{$color} rg\n{$x} {$y} {$width} {$height} re\nf\nQ\n";
     }
 
+    /** Recorta celdas largas para evitar que desborden sus columnas. */
     private function truncate(string $value, int $length): string
     {
         return strlen($value) > $length ? substr($value, 0, max(1, $length - 3)) . '...' : $value;

@@ -195,9 +195,9 @@ if (Auth::check() && Auth::role() === 'Administrador') {
     <?= $content ?>
 </main>
 
-<footer class="footer mt-auto py-3 bg-dark text-white-50 text-center">
+<footer class="footer mt-auto py-3 bg-dark text-white text-center">
     <div class="container">
-        <small>&copy; <?= date('Y') ?> &mdash; Restaurante Escuela INTECAP</small>
+        <small class="text-white" style="opacity: 0.9;">&copy; <?= date('Y') ?> &mdash; Restaurante Escuela INTECAP</small>
     </div>
 </footer>
 

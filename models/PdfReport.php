@@ -7,6 +7,10 @@ final class PdfColumn
     public string $label;
     public float $width;
 
+    /**
+     * @param string $label Encabezado visible de la columna.
+     * @param float $width Ancho de la columna en puntos PDF.
+     */
     public function __construct(string $label, float $width)
     {
         $label = trim($label);
@@ -26,6 +30,11 @@ final class PdfFile
     public string $filename;
     public string $contentType;
 
+    /**
+     * @param string $content Bytes del documento generado.
+     * @param string $filename Nombre final de descarga.
+     * @param string $contentType MIME del documento.
+     */
     public function __construct(string $content, string $filename, string $contentType = 'application/pdf')
     {
         if ($content === '' || $filename === '') {

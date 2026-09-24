@@ -22,7 +22,7 @@ class CocinaController extends Controller
     /** Carga menu, consolidado y detalle para la fecha solicitada. */
     public function index(): void
     {
-        $fecha = (string) $this->input('fecha', date('Y-m-d'));
+        $fecha = $this->normalizarFechaConsulta((string) $this->input('fecha', date('Y-m-d')));
 
         $this->render('cocina/index', [
             'fecha_consulta' => $fecha,
@@ -30,6 +30,24 @@ class CocinaController extends Controller
             'consolidado' => $this->cocinaService->obtenerConsolidadoPorFecha($fecha),
             'reservas_detalle' => $this->cocinaService->obtenerReservasDetalladasPorFecha($fecha),
         ]);
+    }
+
+    /**
+     * Asegura que el filtro de cocina siempre sea una fecha ISO válida.
+     *
+     * Las fechas inválidas o valores con hora se reemplazan por el día actual
+     * para impedir que una entrada ambigua consulte registros históricos.
+     */
+    private function normalizarFechaConsulta(string $fecha): string
+    {
+        $fechaNormalizada = DateTimeImmutable::createFromFormat('!Y-m-d', trim($fecha));
+        $errores = DateTimeImmutable::getLastErrors();
+
+        if ($fechaNormalizada === false || ($errores !== false && ($errores['warning_count'] > 0 || $errores['error_count'] > 0))) {
+            return date('Y-m-d');
+        }
+
+        return $fechaNormalizada->format('Y-m-d');
     }
 
     // POST /cocina/guardar-menu (multipart/form-data con imagen opcional)
@@ -171,6 +189,7 @@ class CocinaController extends Controller
         $writer->setHeaderColor('1F4E78');
         $writer->setColumnWidths([6, 24, 28, 10, 14, 14, 14, 14, 22, 10, 10]);
         $writer->setPageLayout('landscape', 1, 1, 0.25, 0.25, 0.35, 0.35);
+        $writer->setIntegerColumns([0, 3]);
         $writer->setHeaders(['#', 'Empleado', 'Platillo', 'Cantidad', 'Precio Unitario', 'Total', 'Pago en Efectivo', 'Pago con Carnet', 'Consumo en Restaurante / Para Llevar', 'Dieta', 'Normal']);
 
         foreach ($filas as $item) {
@@ -229,7 +248,6 @@ class CocinaController extends Controller
         }
 
         $pdf = new PdfWriter('Reservas de Cocina');
-        $pdf->addLine('Restaurante Escuela INTECAP');
         $pdf->addLine('Fecha: ' . $fecha . ' · Generado: ' . date('d/m/Y H:i'));
         $pdf->setSummary([
             'Reservas' => (string) count($filas),
