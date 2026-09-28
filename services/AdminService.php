@@ -114,9 +114,10 @@ class AdminService
             return [true, 'CONTRASENA_INICIAL:' . $contrasenaInicial . '|Usuario y límites guardados correctamente.'];
         }
 
-        $stmtExiste = $this->db->prepare('SELECT id FROM usuarios WHERE id = :id');
+        $stmtExiste = $this->db->prepare('SELECT id, nombre, email FROM usuarios WHERE id = :id');
         $stmtExiste->execute(['id' => $id]);
-        if (!$stmtExiste->fetch()) {
+        $usuarioExistente = $stmtExiste->fetch();
+        if (!$usuarioExistente) {
             return [false, 'El usuario no existe.'];
         }
 
@@ -130,17 +131,38 @@ class AdminService
             'id' => $id,
         ];
 
-        if ($password !== '') {
+        $cambioPassword = ($password !== '');
+        if ($cambioPassword) {
             $sql .= ', password = :password';
             $params['password'] = password_hash($password, PASSWORD_BCRYPT);
         }
 
         $sql .= ' WHERE id = :id';
 
-        $update = $this->db->prepare($sql);
-        $update->execute($params);
+        try {
+            $update = $this->db->prepare($sql);
+            $update->execute($params);
+            $this->actualizarLimiteRol($rolId, $maxAlmuerzos);
+        } catch (Throwable $e) {
+            return [false, 'No se pudo actualizar la información del usuario en la base de datos.'];
+        }
 
-        $this->actualizarLimiteRol($rolId, $maxAlmuerzos);
+        if ($cambioPassword) {
+            // El flujo estricto: CAMBIO DE CONTRASEÑA → VALIDACIÓN → ACTUALIZACIÓN EXITOSA EN BD → ENVÍO DEL CORREO → CONFIRMACIÓN
+            [$correoEnviado, $correoMensaje] = $this->correoService->enviarCorreoNotificacionCambio(
+                ['nombre' => $nombre, 'email' => $email],
+                $password
+            );
+
+            if (!$correoEnviado) {
+                // Registrar el error sin exponer la contraseña en logs
+                error_log("Error al enviar notificación de contraseña actualizada al usuario {$email}: {$correoMensaje}");
+                // No revertir el cambio de contraseña; informar al administrador que hubo un problema con el correo
+                return [true, "WARN:Contraseña actualizada correctamente, pero ocurrió un problema al enviar la notificación por correo: {$correoMensaje}"];
+            }
+
+            return [true, "OK:Contraseña actualizada correctamente. Se ha enviado una notificación por correo a {$email}."];
+        }
 
         return [true, 'Usuario y límites guardados correctamente.'];
     }
@@ -299,10 +321,8 @@ class AdminService
             return [false, 'ERR:La solicitud ya fue atendida previamente.'];
         }
 
-        // El administrador puede atender la solicitud incluso si corresponde a su propia cuenta.
-        // Esto evita errores al hacer clic en el botón de restablecimiento desde la pantalla de solicitudes.
-        // Comportamiento alineado con el sistema original en C#
-        $contrasenaRestablecida = '87654321';
+        // Si el administrador introdujo una contraseña personalizada se utiliza esa; de lo contrario, se usa 87654321
+        $contrasenaRestablecida = trim($nuevaPassword) !== '' ? trim($nuevaPassword) : '87654321';
         $hash = password_hash($contrasenaRestablecida, PASSWORD_BCRYPT);
 
         $this->db->beginTransaction();
@@ -323,14 +343,18 @@ class AdminService
             return [false, 'ERR:No se pudo guardar la nueva contraseña.'];
         }
 
-        // Notificar por correo es una cortesía adicional: si SMTP no está configurado o falla,
-        // la contraseña ya quedó restablecida y no debe revertirse la operación por ese motivo.
-        $this->correoService->enviarRestablecimientoPassword(
+        // Notificar por correo tras la actualización exitosa en la base de datos
+        [$correoEnviado, $correoMensaje] = $this->correoService->enviarCorreoNotificacionCambio(
             ['nombre' => $solicitud['usuario_nombre'], 'email' => $solicitud['usuario_email']],
             $contrasenaRestablecida
         );
 
-        return [true, "OK:Contraseña restablecida a {$contrasenaRestablecida}. La solicitud ha sido marcada como Realizado."];
+        if (!$correoEnviado) {
+            error_log("Error al enviar notificación tras restablecimiento a {$solicitud['usuario_email']}: {$correoMensaje}");
+            return [true, "WARN:Contraseña restablecida a {$contrasenaRestablecida}, pero ocurrió un problema al enviar la notificación por correo: {$correoMensaje}"];
+        }
+
+        return [true, "OK:Contraseña restablecida a {$contrasenaRestablecida}. Se envió la notificación por correo a {$solicitud['usuario_email']}."];
     }
 
     // Detalle completo de un usuario: datos + historial de reservas + totales acumulados

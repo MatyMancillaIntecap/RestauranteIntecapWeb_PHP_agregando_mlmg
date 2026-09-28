@@ -420,7 +420,7 @@ Editar `public/css/site.css`. Bootstrap 5.3 se carga desde CDN y puede sobreescr
 
 Editar `public/js/site.js`. jQuery 3.7 y Bootstrap JS se cargan desde CDN.
 
-### Modificar la base de datos
+### Modificar la b|||              ase de datos
 
 1. Ejecutar el ALTER TABLE o CREATE TABLE en phpMyAdmin
 2. Actualizar la clase correspondiente en `models/Entidades.php`
@@ -442,7 +442,7 @@ Este proyecto **no usa Composer**. Toda la funcionalidad está implementada con 
 |--------------|----------|
 | Base de datos | PDO + pdo_mysql |
 | Autenticación | Sesiones nativas PHP |
-| Hash contraseñas | `password_hash()` / `password_verify()` con `PASSWORD_BCRYPT` |
+| Hash contraseñas | `password_hash()` / `password_verify()` con `xaPASSWORD_BCRYPT` |
 | Envío de correo | SmtpMailer propio (sockets PHP) |
 | Exportación de datos | `fputcsv()` nativo PHP |
 | Enrutamiento | Router propio (kebab-case → camelCase) |

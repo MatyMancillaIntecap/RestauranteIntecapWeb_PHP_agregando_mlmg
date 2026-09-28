@@ -139,15 +139,18 @@ class AdminController extends Controller
         }
 
         [$exito, $mensaje] = $this->adminService->guardarUsuario($dto);
+        $mensajeLimpio = $this->limpiarPrefijoMensaje($mensaje);
 
         if (!$exito) {
-            $this->flash('error', $mensaje);
+            $this->flash('error', $mensajeLimpio);
         } elseif (str_contains($mensaje, 'CONTRASENA_INICIAL:')) {
             $partes = explode('|', $mensaje);
             $contrasenaInfo = trim(str_replace('CONTRASENA_INICIAL:', '', $partes[0]));
             $this->flash('exito', 'Usuario creado exitosamente. Contraseña inicial: ' . $contrasenaInfo);
+        } elseif (str_starts_with($mensaje, 'WARN:')) {
+            $this->flash('advertencia', $mensajeLimpio);
         } else {
-            $this->flash('exito', $mensaje);
+            $this->flash('exito', $mensajeLimpio);
         }
 
         $this->redirect('admin/usuarios');
@@ -194,13 +197,21 @@ class AdminController extends Controller
     }
 
     // POST /admin/atender-solicitud-restablecimiento
-    /** Atiende una solicitud y asigna la contrasena temporal definida. */
+    /** Atiende una solicitud y asigna la contrasena definida por el administrador o la sugerida. */
     public function atenderSolicitudRestablecimiento(): void
     {
         $solicitudId = (int) $this->input('solicitud_id', 0);
-        // El comportamiento original del sistema C# usa una contraseña temporal fija y no requiere
-        // que el administrador escriba una nueva contraseña manualmente.
-        $nuevaPassword = '87654321';
+        $nuevaPassword = trim((string) $this->input('nueva_password', '87654321'));
+
+        if ($nuevaPassword === '') {
+            $nuevaPassword = '87654321';
+        }
+
+        if (strlen($nuevaPassword) < 8) {
+            $this->flash('error', 'La nueva contraseña debe tener al menos 8 caracteres.');
+            $this->redirect('admin/solicitudes-restablecimiento');
+            return;
+        }
 
         [$exito, $mensaje] = $this->adminService->atenderSolicitudRestablecimiento($solicitudId, $nuevaPassword, Auth::id());
         $mensajeLimpio = $this->limpiarPrefijoMensaje($mensaje);

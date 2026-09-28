@@ -54,6 +54,7 @@
                                 <th>Correo</th>
                                 <th>Fecha Solicitud</th>
                                 <th>Estado</th>
+                                <th class="text-center pe-3">Acción</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -64,6 +65,12 @@
                                     <td><?= htmlspecialchars($s['email_usuario']) ?></td>
                                     <td><?= htmlspecialchars($s['fecha_solicitud']) ?></td>
                                     <td><span class="badge bg-warning text-dark">📋 Pendiente</span></td>
+                                    <td class="text-center pe-3">
+                                        <button class="btn btn-sm btn-primary fw-bold"
+                                                onclick="abrirModalAtencion(<?= (int)$s['id'] ?>, '<?= htmlspecialchars($s['nombre_usuario'], ENT_QUOTES) ?>', '<?= htmlspecialchars($s['email_usuario'], ENT_QUOTES) ?>')">
+                                            🔐 Restablecer
+                                        </button>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -154,10 +161,14 @@
                         <label class="form-label fw-bold">📧 Correo</label>
                         <input type="text" id="modal_correo" class="form-control" readonly>
                     </div>
-                    <div class="alert alert-info small" role="alert">
-                        <strong>ℹ️ Información:</strong><br>
-                        La contraseña será restablecida automáticamente a <code>87654321</code>.<br>
-                        El usuario podrá cambiarla después de iniciar sesión.
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">🔐 Nueva Contraseña <span class="text-danger">*</span></label>
+                        <input type="text" name="nueva_password" id="modal_nueva_password" class="form-control"
+                               value="87654321" required minlength="8"
+                               placeholder="Ingrese la nueva contraseña (mínimo 8 caracteres)">
+                        <small class="text-muted d-block mt-1">
+                            Puedes ingresar una contraseña personalizada o mantener la sugerida (<code>87654321</code>).
+                        </small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -173,9 +184,10 @@
 
 <script>
 function abrirModalAtencion(id, usuario, correo) {
-    document.getElementById('modal_solicitud_id').value = id;
-    document.getElementById('modal_usuario').value      = usuario;
-    document.getElementById('modal_correo').value       = correo;
+    document.getElementById('modal_solicitud_id').value     = id;
+    document.getElementById('modal_usuario').value          = usuario;
+    document.getElementById('modal_correo').value           = correo;
+    document.getElementById('modal_nueva_password').value   = '87654321';
     new bootstrap.Modal(document.getElementById('modalAtencionSolicitud')).show();
 }
 </script>
