@@ -9,33 +9,36 @@
 ?>
 <div class="container-fluid mt-4 mb-5">
 
-    <!-- CABECERA DEL HISTORIAL -->
-    <div class="mb-4">
-        <div>
-            <h3 class="text-primary fw-bold mb-0">📜 Mi Historial de Reservas</h3>
-            <p class="text-muted small mb-0">
-                Consulta tus solicitudes de almuerzos realizadas.
+    <!-- // CABECERA DEL HISTORIAL CON COLORES FUERTES INTECAP -->
+    <div class="card shadow mb-4 rounded-3 text-white"
+         style="background: linear-gradient(135deg, #0a2540 0%, #123d6b 50%, #1e40af 100%); border: 2.5px solid #0f2b48 !important;">
+        <div class="card-body p-4">
+            <h3 class="text-white fw-bold mb-1 d-flex align-items-center gap-2">
+                <span>📜</span> Mi Historial de Reservas
+            </h3>
+            <p class="text-white-50 mb-0">
+                Consulta tus solicitudes de almuerzos realizadas y gestiona tus reservas.
             </p>
         </div>
     </div>
 
     <!-- FILTRO POR RANGO DE FECHAS -->
-    <div class="card shadow-sm border-0 rounded-3 mb-4">
-        <div class="card-body bg-light p-3">
+    <div class="card shadow-sm rounded-3 mb-4 border-2" style="background: #f8fafc; border: 2px solid #cbd5e1 !important;">
+        <div class="card-body p-3">
             <form method="get" action="<?= BASE_URL ?>/empleado/historial"
                   class="row g-3 align-items-end">
                 <div class="col-md-4 col-6">
-                    <label class="form-label small fw-bold text-secondary">Fecha Inicio:</label>
+                    <label class="form-label small fw-bold text-dark">Fecha Inicio:</label>
                     <input type="date" name="fechaInicio" class="form-control"
                            value="<?= htmlspecialchars($fecha_inicio) ?>">
                 </div>
                 <div class="col-md-4 col-6">
-                    <label class="form-label small fw-bold text-secondary">Fecha Fin:</label>
+                    <label class="form-label small fw-bold text-dark">Fecha Fin:</label>
                     <input type="date" name="fechaFin" class="form-control"
                            value="<?= htmlspecialchars($fecha_fin) ?>">
                 </div>
                 <div class="col-md-4 col-12 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary fw-bold w-100">
+                    <button type="submit" class="btn btn-primary fw-bold w-100 shadow-sm">
                         🔍 Filtrar
                     </button>
                     <a href="<?= BASE_URL ?>/empleado/historial" class="btn btn-outline-secondary fw-bold">
@@ -46,12 +49,19 @@
         </div>
     </div>
 
-    <!-- TABLA DE HISTORIAL -->
-    <div class="card shadow-sm border-0 rounded-3">
+    <!-- TABLA DE HISTORIAL ENMARCADA -->
+    <div class="card shadow rounded-3 border-2">
+        <div class="card-header text-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2"
+             style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;">
+            <h5 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                <span>📜</span> Solicitudes y Reservas Realizadas
+            </h5>
+            <span class="badge bg-warning text-dark fw-bold shadow-sm"><?= count($historial) ?> registros</span>
+        </div>
         <div class="card-body p-0">
-            <div class="table-responsive">
+            <div class="table-responsive border-0">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th class="ps-3"># Reserva</th>
                             <th>Fecha Consumo</th>

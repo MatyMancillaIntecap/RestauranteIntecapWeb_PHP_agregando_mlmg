@@ -24,150 +24,184 @@
         </div>
     </div>
 
-    <!-- 4 TARJETAS DE MÉTRICAS -->
+    <!-- // TARJETAS DE MÉTRICAS CON COLORES LLAMATIVOS, FUERTES Y LÍMITES CLAROS -->
     <div class="row g-4 mb-4">
 
-        <!-- Platillos de Dieta -->
+        <!-- Platillos de Dieta (Azul Cyan Eléctrico) -->
         <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-3 p-3 h-100" style="background-color:#ADD8E6;">
+            <div class="card shadow rounded-3 p-3 h-100 text-white"
+                 style="background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%); border: 2.5px solid #0369a1 !important;">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <span class="text-dark small fw-bold text-uppercase">🥗 Platillos de Dieta</span>
-                        <h4 class="fw-bold text-dark mt-2 mb-0">
-                            <?= (int)$dieta_solicitados ?> solicitados / <?= (int)$dieta_iniciales ?> publicados
-                        </h4>
+                        <span class="badge bg-white text-info mb-2 fw-bold text-uppercase shadow-sm">🥗 Platillos Dieta</span>
+                        <h3 class="fw-bold text-white mb-0">
+                            <?= (int)$dieta_solicitados ?> <small class="text-white-50 fs-6">/ <?= (int)$dieta_iniciales ?> publ.</small>
+                        </h3>
+                        <small class="text-white-50 d-block mt-1 fw-semibold">Platillos solicitados hoy</small>
                     </div>
-                    <div class="fs-1 text-primary">🌿</div>
+                    <div class="fs-1 p-2 rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                         style="width: 58px; height: 58px; background: rgba(255, 255, 255, 0.25);">
+                        🌿
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Platillos Normales -->
+        <!-- Platillos Normales (Púrpura / Violeta Intenso) -->
         <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-3 p-3 h-100" style="background-color:#9ACD32;">
+            <div class="card shadow rounded-3 p-3 h-100 text-white"
+                 style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); border: 2.5px solid #6d28d9 !important;">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <span class="text-dark small fw-bold text-uppercase">🍽️ Platillos Normales</span>
-                        <h4 class="fw-bold text-dark mt-2 mb-0">
-                            <?= (int)$normales_solicitados ?> solicitados / <?= (int)$normales_iniciales ?> publicados
-                        </h4>
+                        <span class="badge bg-white mb-2 fw-bold text-uppercase shadow-sm" style="color: #7c3aed;">🍽️ Platillos Normales</span>
+                        <h3 class="fw-bold text-white mb-0">
+                            <?= (int)$normales_solicitados ?> <small class="text-white-50 fs-6">/ <?= (int)$normales_iniciales ?> publ.</small>
+                        </h3>
+                        <small class="text-white-50 d-block mt-1 fw-semibold">Platillos solicitados hoy</small>
                     </div>
-                    <div class="fs-1 text-success">🍛</div>
+                    <div class="fs-1 p-2 rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                         style="width: 58px; height: 58px; background: rgba(255, 255, 255, 0.25);">
+                        🍛
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Ventas de Hoy -->
+        <!-- Ventas de Hoy (Verde Esmeralda Brillante) -->
         <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-3 p-3 h-100" style="background-color:#FF7F50;">
+            <div class="card shadow rounded-3 p-3 h-100 text-white"
+                 style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border: 2.5px solid #047857 !important;">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <span class="text-white small fw-bold text-uppercase">💰 Ventas de Hoy</span>
-                        <h4 class="fw-bold text-white mt-2 mb-0">
+                        <span class="badge bg-white text-success mb-2 fw-bold text-uppercase shadow-sm">💰 Ventas del Día</span>
+                        <h3 class="fw-bold text-white mb-0">
                             Q <?= number_format((float)$ventas_hoy, 2) ?>
-                        </h4>
+                        </h3>
+                        <small class="text-white-50 d-block mt-1 fw-semibold">Ingresos recaudados hoy</small>
                     </div>
-                    <div class="fs-1 text-warning">💵</div>
+                    <div class="fs-1 p-2 rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                         style="width: 58px; height: 58px; background: rgba(255, 255, 255, 0.25);">
+                        💵
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Reservas de Hoy -->
+        <!-- Reservas de Hoy (Rojo Rubí / Coral Intenso) -->
         <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-3 p-3 h-100" style="background-color:#FFF0F5;">
+            <div class="card shadow rounded-3 p-3 h-100 text-white"
+                 style="background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%); border: 2.5px solid #be123c !important;">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <span class="text-dark small fw-bold text-uppercase">🍽️ Reservas de Hoy</span>
-                        <h4 class="fw-bold text-dark mt-2 mb-0">
-                            <?= (int)$reservas_hoy ?> solicitudes
-                        </h4>
+                        <span class="badge bg-white text-danger mb-2 fw-bold text-uppercase shadow-sm">📋 Reservas del Día</span>
+                        <h3 class="fw-bold text-white mb-0">
+                            <?= (int)$reservas_hoy ?> <small class="text-white-50 fs-6">solicitudes</small>
+                        </h3>
+                        <small class="text-white-50 d-block mt-1 fw-semibold">Total pedidos registrados</small>
                     </div>
-                    <div class="fs-1 text-danger">📋</div>
+                    <div class="fs-1 p-2 rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                         style="width: 58px; height: 58px; background: rgba(255, 255, 255, 0.25);">
+                        👥
+                    </div>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <!-- TARJETAS USUARIOS + LA CARTA -->
-    <div class="row mb-4">
-        <div class="col-md-6 mb-3 mb-md-0">
-            <div class="card border-0 shadow-sm rounded-3 p-3 bg-dark text-white h-100">
-                <div class="d-flex justify-content-between align-items-center">
+    <!-- TARJETAS USUARIOS + LA CARTA CON COLORES LLAMATIVOS -->
+    <div class="row g-4 mb-4">
+        <!-- Usuarios del Sistema (Azul Marino Oscuro Pizarra) -->
+        <div class="col-md-6">
+            <div class="card shadow rounded-3 p-3 h-100 text-white"
+                 style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 2.5px solid #334155 !important;">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
-                        <span class="text-light small fw-bold text-uppercase">👥 Usuarios del Sistema</span>
-                        <h5 class="fw-bold text-info mt-1 mb-0">
-                            <?= (int)$usuarios_con_reserva ?> con reservas hoy / <?= (int)$total_usuarios ?> registrados
+                        <span class="badge bg-warning text-dark mb-2 fw-bold text-uppercase shadow-sm">👥 Usuarios del Sistema</span>
+                        <h5 class="fw-bold text-white mt-1 mb-0">
+                            <?= (int)$usuarios_con_reserva ?> con reserva hoy <span class="text-white-50 fs-6">/ <?= (int)$total_usuarios ?> registrados</span>
                         </h5>
+                        <small class="text-white-50">Gestión de roles y accesos al restaurante</small>
                     </div>
-                    <div class="fs-2">👤</div>
+                    <a href="<?= BASE_URL ?>/admin/usuarios" class="btn btn-warning text-dark fw-bold btn-sm shadow">
+                        Ver Usuarios →
+                    </a>
                 </div>
             </div>
         </div>
-        <!-- Reemplazo de Solicitudes por La Carta -->
+        <!-- Acceso directo a La Carta (Azul Zafiro Brillante) -->
         <div class="col-md-6">
-            <a href="<?= BASE_URL ?>/carta/index"
-               class="card border-0 shadow-sm rounded-3 p-3 bg-primary text-white text-decoration-none h-100 d-block">
-                <div class="d-flex justify-content-between align-items-center">
+            <div class="card shadow rounded-3 p-3 h-100 text-white"
+                 style="background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%); border: 2.5px solid #1e40af !important;">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
-                        <span class="small fw-bold text-uppercase text-light">📖 La Carta</span>
-                        <h5 class="fw-bold mt-1 mb-0">Gestión de Productos por Categoría</h5>
+                        <span class="badge bg-white text-primary mb-2 fw-bold text-uppercase shadow-sm">📖 Módulo La Carta</span>
+                        <h5 class="fw-bold text-white mt-1 mb-0">Catálogo General y Recuento Consolidado</h5>
+                        <small class="text-white-50">Entradas, platos fuertes, bebidas y postres</small>
                     </div>
-                    <div class="fs-2">🍽️</div>
+                    <a href="<?= BASE_URL ?>/carta/admin" class="btn btn-light text-primary fw-bold btn-sm shadow">
+                        Administrar →
+                    </a>
                 </div>
-            </a>
+            </div>
         </div>
     </div>
 
     <!-- RESUMEN ESTADÍSTICO DETALLADO CON FILTRO POR FECHA -->
-    <div class="card shadow-sm border-0 rounded-3">
-        <div class="card-header bg-primary text-white py-3">
-            <h5 class="mb-0 fw-bold">📊 Resumen Estadístico Detallado por Fecha</h5>
+    <div class="card shadow rounded-3 border-2">
+        <div class="card-header bg-primary text-white py-3" style="background: linear-gradient(135deg, #0a2540 0%, #123d6b 50%, #1e40af 100%) !important;">
+            <h5 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                <span>📊</span> Resumen Estadístico Detallado por Fecha
+            </h5>
         </div>
-        <div class="card-body">
+        <div class="card-body p-4">
 
-            <!-- Formulario de filtro de KPIs -->
-            <form method="get" action="<?= BASE_URL ?>/admin/index" class="row g-3 align-items-end mb-4">
-                <div class="col-md-4 col-12">
-                    <label class="form-label small fw-bold">Fecha inicio:</label>
-                    <input type="date" name="fechaInicio" class="form-control"
-                           value="<?= htmlspecialchars($fecha_inicio) ?>">
-                </div>
-                <div class="col-md-4 col-12">
-                    <label class="form-label small fw-bold">Fecha fin:</label>
-                    <input type="date" name="fechaFin" class="form-control"
-                           value="<?= htmlspecialchars($fecha_fin) ?>">
-                </div>
-                <div class="col-md-2 col-12">
-                    <button type="submit" class="btn btn-dark w-100 fw-bold">🔍 Filtrar</button>
-                </div>
-            </form>
+            <!-- Formulario de filtro de KPIs con límites y colores -->
+            <div class="p-3 rounded-3 mb-4 shadow-sm" style="background: #f8fafc; border: 2px solid #cbd5e1 !important;">
+                <form method="get" action="<?= BASE_URL ?>/admin/index" class="row g-3 align-items-end">
+                    <div class="col-md-5 col-12">
+                        <label class="form-label small fw-bold text-dark">Fecha inicio:</label>
+                        <input type="date" name="fechaInicio" class="form-control"
+                               value="<?= htmlspecialchars($fecha_inicio) ?>">
+                    </div>
+                    <div class="col-md-5 col-12">
+                        <label class="form-label small fw-bold text-dark">Fecha fin:</label>
+                        <input type="date" name="fechaFin" class="form-control"
+                               value="<?= htmlspecialchars($fecha_fin) ?>">
+                    </div>
+                    <div class="col-md-2 col-12">
+                        <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">🔍 Filtrar</button>
+                    </div>
+                </form>
+            </div>
 
             <hr>
 
-            <!-- Tarjetas de resumen detallado -->
-            <div class="row text-center">
-                <div class="col-md-4 mb-3">
-                    <div class="p-3 bg-light rounded border">
-                        <span class="text-muted small d-block">Total de Ventas en la Fecha</span>
-                        <h4 class="fw-bold text-success">Q <?= number_format((float)$ventas_hoy, 2) ?></h4>
+            <!-- Tarjetas de resumen detallado con colores vivos -->
+            <div class="row text-center g-3">
+                <div class="col-md-4 col-12">
+                    <div class="p-3 rounded-3 shadow-sm h-100" style="background: #ecfdf5; border: 2.5px solid #10b981 !important;">
+                        <span class="text-success small fw-bold text-uppercase d-block">💰 Total de Ventas en la Fecha</span>
+                        <h3 class="fw-bold text-success mt-2 mb-0">Q <?= number_format((float)$ventas_hoy, 2) ?></h3>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <div class="p-3 bg-light rounded border">
-                        <span class="text-muted small d-block">Total de Reservas Activas</span>
-                        <h4 class="fw-bold text-primary"><?= (int)$reservas_hoy ?></h4>
+                <div class="col-md-4 col-12">
+                    <div class="p-3 rounded-3 shadow-sm h-100" style="background: #eff6ff; border: 2.5px solid #3b82f6 !important;">
+                        <span class="text-primary small fw-bold text-uppercase d-block">📋 Total de Reservas Activas</span>
+                        <h3 class="fw-bold text-primary mt-2 mb-0"><?= (int)$reservas_hoy ?></h3>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <div class="p-3 bg-light rounded border">
-                        <span class="text-muted small d-block">Usuarios que Reservaron</span>
-                        <h4 class="fw-bold text-dark">
-                            <?= (int)$usuarios_con_reserva ?> / <?= (int)$total_usuarios ?>
-                        </h4>
+                <div class="col-md-4 col-12">
+                    <div class="p-3 rounded-3 shadow-sm h-100" style="background: #faf5ff; border: 2.5px solid #8b5cf6 !important;">
+                        <span class="small fw-bold text-uppercase d-block" style="color: #7c3aed;">👥 Usuarios que Reservaron</span>
+                        <h3 class="fw-bold mt-2 mb-0" style="color: #6d28d9;">
+                            <?= (int)$usuarios_con_reserva ?> <small class="fs-6 opacity-75">/ <?= (int)$total_usuarios ?></small>
+                        </h3>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
         </div>
     </div>
 

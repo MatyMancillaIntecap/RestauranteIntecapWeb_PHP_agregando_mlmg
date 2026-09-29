@@ -3,12 +3,14 @@ declare(strict_types=1);
 /**
  * Controlador de La Carta.
  *
- * Expone la visualización, selección y cálculo de totales para todos los usuarios autenticados,
- * y protege las operaciones de gestión (crear, editar, activar/desactivar, eliminar, subir imagen)
- * exclusivamente para el rol Administrador.
+ * Coordina la visualización, selección interactiva (Sí/No) y reservas con control de stock y horarios.
+ * Para el administrador, ofrece el panel unificado de todas las categorías,
+ * gestión completa de productos y recuento consolidado de reservas.
  */
 
 require_once ROOT_PATH . '/services/CartaService.php';
+require_once ROOT_PATH . '/services/ExcelWriter.php';
+require_once ROOT_PATH . '/services/PdfWriter.php';
 
 class CartaController extends Controller
 {
@@ -16,41 +18,73 @@ class CartaController extends Controller
 
     public function __construct()
     {
-        // Todos los métodos de La Carta requieren que el usuario esté autenticado
+        // Se requiere sesión activa para cualquier interacción con La Carta
         Auth::requireLogin();
         $this->cartaService = new CartaService();
     }
 
     // GET /carta o /carta/index
-    // Vista principal para clientes y usuarios: visualización por categoría, selección (máx 1 por categoría) y total
+    // Vista de cliente/usuario: muestra productos vigentes en su horario y con stock > 0
     public function index(): void
     {
+        // Para comensales se muestran solo los productos activos, con horario vigente y stock disponible
         $productosPorCategoria = $this->cartaService->obtenerTodosAgrupadosPorCategoria(true);
         $esAdmin = (Auth::role() === 'Administrador');
+
+        // Obtener NIT predeterminado del usuario actual si existe
+        $nitUsuario = 'C/F';
+        try {
+            $db = Database::getConnection();
+            $stmt = $db->prepare('SELECT nit_facturacion FROM usuarios WHERE id = :id');
+            $stmt->execute(['id' => Auth::id()]);
+            $nitUsuario = $stmt->fetchColumn() ?: 'C/F';
+        } catch (Throwable $e) {
+            $nitUsuario = 'C/F';
+        }
 
         $this->render('carta/index', [
             'productosPorCategoria' => $productosPorCategoria,
             'categorias' => CartaService::CATEGORIAS,
             'esAdmin' => $esAdmin,
+            'nitUsuario' => $nitUsuario,
         ]);
     }
 
     // GET /carta/admin
-    // Vista de administración de La Carta (exclusiva para Administrador)
+    // Panel de administración de La Carta: catálogo general y recuento consolidado en pestañas con exportaciones Excel/PDF
     public function admin(): void
     {
         Auth::requireRole(['Administrador']);
 
+        $tabActiva = (string) $this->input('tab', 'catalogo');
+        $fechaParam = $this->input('fecha');
+        $fechaFiltro = ($fechaParam !== null) ? trim((string) $fechaParam) : date('Y-m-d');
+
         $productosPorCategoria = $this->cartaService->obtenerTodosAgrupadosPorCategoria(false);
+        // Productos vigentes con stock para reservas directas desde el panel de administración
+        $productosDisponibles = $this->cartaService->obtenerTodosAgrupadosPorCategoria(true);
+        $consolidado = $this->cartaService->obtenerConsolidado($fechaFiltro !== '' ? $fechaFiltro : null);
+        $reservasDetalladas = $this->cartaService->obtenerReservasDetalladas($fechaFiltro !== '' ? $fechaFiltro : null);
+
+        // Lista de usuarios activos para permitir que el administrador reserve por sí mismo o para un comensal
+        $db = Database::getConnection();
+        $stmtUsuarios = $db->query('SELECT id, nombre, email FROM usuarios WHERE activo = 1 ORDER BY nombre ASC');
+        $usuarios = $stmtUsuarios->fetchAll();
 
         $this->render('carta/admin', [
             'productosPorCategoria' => $productosPorCategoria,
+            'productosDisponibles' => $productosDisponibles,
             'categorias' => CartaService::CATEGORIAS,
+            'consolidado' => $consolidado,
+            'reservasDetalladas' => $reservasDetalladas,
+            'fechaFiltro' => $fechaFiltro,
+            'tabActiva' => $tabActiva,
+            'usuarios' => $usuarios,
         ]);
     }
 
     // POST /carta/guardar
-    // Crea o actualiza un producto de La Carta con imagen opcional (exclusivo para Administrador)
+    // Guarda o actualiza un producto con stock y horarios configurables (solo Administrador)
     public function guardar(): void
     {
         Auth::requireRole(['Administrador']);
@@ -60,9 +94,15 @@ class CartaController extends Controller
         $nombre = trim((string) $this->input('nombre', ''));
         $descripcion = trim((string) $this->input('descripcion', ''));
         $precio = (float) $this->input('precio', 0);
+        $stock = max(0, (int) $this->input('stock', 10));
         $activo = $this->input('estado') !== null;
 
-        // Validaciones del servidor
+        // Días y horario configurables
+        $diasHabilitados = trim((string) $this->input('dias_habilitados', 'Todos')) ?: 'Todos';
+        $fechaHabilitacion = trim((string) $this->input('fecha_habilitacion', '')) ?: null;
+        $horaInicio = trim((string) $this->input('hora_inicio', '00:00')) ?: '00:00';
+        $horaFin = trim((string) $this->input('hora_fin', '23:59')) ?: '23:59';
+
         if ($categoria === '') {
             $this->flash('error', 'Debe seleccionar una categoría para el producto.');
             $this->redirect('carta/admin');
@@ -87,10 +127,15 @@ class CartaController extends Controller
             'nombre' => $nombre,
             'descripcion' => $descripcion !== '' ? $descripcion : null,
             'precio' => $precio,
+            'stock' => $stock,
+            'dias_habilitados' => $diasHabilitados,
+            'fecha_habilitacion' => $fechaHabilitacion,
+            'hora_inicio' => $horaInicio,
+            'hora_fin' => $horaFin,
             'estado' => $activo ? 1 : 0,
         ];
 
-        // Procesar subida de imagen siguiendo el patrón de Cocina
+        // Procesar imagen si se adjuntó
         if (!empty($_FILES['imagen_file']['name']) && $_FILES['imagen_file']['error'] === UPLOAD_ERR_OK) {
             $ext = strtolower((string) pathinfo($_FILES['imagen_file']['name'], PATHINFO_EXTENSION));
             $permitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
@@ -126,7 +171,6 @@ class CartaController extends Controller
     }
 
     // GET /carta/obtener-producto-por-id/{id}
-    // Devuelve los datos de un producto en formato JSON para el modal de edición (solo Administrador)
     public function obtenerProductoPorId($id = null): void
     {
         Auth::requireRole(['Administrador']);
@@ -141,7 +185,6 @@ class CartaController extends Controller
     }
 
     // POST /carta/cambiar-estado
-    // Activa o desactiva un producto mediante AJAX (solo Administrador)
     public function cambiarEstado(): void
     {
         Auth::requireRole(['Administrador']);
@@ -164,7 +207,6 @@ class CartaController extends Controller
     }
 
     // POST /carta/eliminar
-    // Elimina un producto de La Carta (solo Administrador)
     public function eliminar(): void
     {
         Auth::requireRole(['Administrador']);
@@ -181,8 +223,7 @@ class CartaController extends Controller
     }
 
     // POST /carta/calcular-total
-    // Validación backend de las selecciones del usuario y cálculo exacto del total
-    // Accesible para cualquier usuario autenticado
+    // Calcula el total en backend a partir de las selecciones Sí/No
     public function calcularTotal(): void
     {
         $body = $this->jsonBody();
@@ -190,7 +231,6 @@ class CartaController extends Controller
             $body = $_POST;
         }
 
-        // Estructurar arreglo de selección
         $selecciones = [
             'Entrada' => $body['entrada_id'] ?? $body['Entrada'] ?? null,
             'Plato fuerte' => $body['plato_fuerte_id'] ?? $body['Plato fuerte'] ?? null,
@@ -206,5 +246,183 @@ class CartaController extends Controller
         }
 
         $this->json($resultado, 200);
+    }
+
+    // POST /carta/realizar-reserva
+    // Registra una reserva en firme sobre La Carta y descuenta stock
+    // Accesible para cualquier usuario autenticado (incluido el Administrador)
+    public function realizarReserva(): void
+    {
+        $body = $this->jsonBody();
+        if (empty($body)) {
+            $body = $_POST;
+        }
+
+        $usuarioId = Auth::id();
+        // Si el usuario es administrador y especificó un usuario_id válido, se permite reservar para dicho comensal
+        if (Auth::role() === 'Administrador' && !empty($body['usuario_id'])) {
+            $usuarioId = (int) $body['usuario_id'];
+        }
+
+        $dto = [
+            'usuario_id' => $usuarioId,
+            'entrada_id' => !empty($body['entrada_id']) ? (int) $body['entrada_id'] : null,
+            'plato_fuerte_id' => !empty($body['plato_fuerte_id']) ? (int) $body['plato_fuerte_id'] : null,
+            'bebida_id' => !empty($body['bebida_id']) ? (int) $body['bebida_id'] : null,
+            'postre_id' => !empty($body['postre_id']) ? (int) $body['postre_id'] : null,
+            'donde_consume' => $body['donde_consume'] ?? 'En restaurante',
+            'nit_facturacion' => $body['nit_facturacion'] ?? 'C/F',
+            'fecha_consumo' => !empty($body['fecha_consumo']) ? (string) $body['fecha_consumo'] : date('Y-m-d'),
+        ];
+
+        [$exito, $mensaje, $reservaId] = $this->cartaService->procesarReserva($dto);
+
+        if (!$exito) {
+            $this->json(['ok' => false, 'error' => $mensaje], 400);
+            return;
+        }
+
+        $this->json(['ok' => true, 'mensaje' => $mensaje, 'reserva_id' => $reservaId], 200);
+    }
+
+    // GET /carta/descargar-excel
+    // Genera el reporte de reservas y recuento consolidado de La Carta en formato XLSX (Excel nativo)
+    public function descargarExcel(): void
+    {
+        Auth::requireRole(['Administrador']);
+
+        $fecha = (string) $this->input('fecha', date('Y-m-d'));
+        $filas = $this->cartaService->obtenerReservasDetalladas($fecha !== '' ? $fecha : null);
+
+        $writer = new ExcelWriter();
+        $writer->setSheetName('ReservasLaCarta');
+        $writer->setTitle('RECUENTO CONSOLIDADO Y RESERVAS DE LA CARTA');
+        $subtitulo = 'Restaurante Escuela INTECAP · ';
+        $subtitulo .= ($fecha !== '' ? 'Fecha: ' . $fecha : 'Histórico General');
+        $subtitulo .= ' · Generado: ' . date('d/m/Y H:i');
+        $writer->setSubtitle($subtitulo);
+        $writer->setHeaderColor('1F4E78');
+        $writer->setColumnWidths([10, 24, 28, 20, 24, 18, 18, 14, 18, 14, 20]);
+        $writer->setPageLayout('landscape', 1, 1, 0.25, 0.25, 0.35, 0.35);
+        $writer->setIntegerColumns([0]);
+        $writer->setHeaders([
+            '# Reserva',
+            'Comensal / Usuario',
+            'Correo Electrónico',
+            'Entrada',
+            'Plato Fuerte',
+            'Bebida',
+            'Postre',
+            'Total (Q)',
+            'Modalidad',
+            'NIT Facturación',
+            'Fecha y Hora'
+        ]);
+
+        $totalRecaudado = 0.0;
+        foreach ($filas as $item) {
+            $totalFila = (float) $item['total'];
+            $totalRecaudado += $totalFila;
+
+            $writer->addRow([
+                (int) $item['id'],
+                (string) ($item['usuario_nombre'] ?? 'Usuario'),
+                (string) ($item['usuario_email'] ?? ''),
+                (string) ($item['entrada_nombre'] ?? '—'),
+                (string) ($item['plato_fuerte_nombre'] ?? '—'),
+                (string) ($item['bebida_nombre'] ?? '—'),
+                (string) ($item['postre_nombre'] ?? '—'),
+                (float) $totalFila,
+                (string) ($item['donde_consume'] ?? 'En restaurante'),
+                (string) ($item['nit_facturacion'] ?? 'C/F'),
+                (string) $item['fecha_reserva'],
+            ]);
+        }
+
+        // Fila final con totales destacados
+        $writer->setTotalRow([
+            'TOTAL',
+            count($filas) . ' reservas',
+            '',
+            '',
+            '',
+            '',
+            '',
+            (float) $totalRecaudado,
+            '',
+            '',
+            ''
+        ]);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $filename = 'Recuento_Consolidado_Carta_' . ($fecha !== '' ? str_replace('-', '', $fecha) : 'General') . '.xlsx';
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        echo $writer->generate();
+        exit;
+    }
+
+    // GET /carta/descargar-pdf
+    // Genera el reporte de reservas y recuento consolidado de La Carta en formato PDF nativo
+    public function descargarPdf(): void
+    {
+        Auth::requireRole(['Administrador']);
+
+        $fecha = (string) $this->input('fecha', date('Y-m-d'));
+        $filas = $this->cartaService->obtenerReservasDetalladas($fecha !== '' ? $fecha : null);
+
+        $sumaTotal = 0.0;
+        $totalPlatillos = 0;
+        $filasTabla = [];
+
+        foreach ($filas as $item) {
+            $totalFila = (float) $item['total'];
+            $sumaTotal += $totalFila;
+
+            $conteoPlatos = 0;
+            if (!empty($item['entrada_id'])) $conteoPlatos++;
+            if (!empty($item['plato_fuerte_id'])) $conteoPlatos++;
+            if (!empty($item['bebida_id'])) $conteoPlatos++;
+            if (!empty($item['postre_id'])) $conteoPlatos++;
+            $totalPlatillos += $conteoPlatos;
+
+            $filasTabla[] = [
+                '#' . $item['id'],
+                $item['usuario_nombre'] ?? 'Usuario',
+                $item['entrada_nombre'] ?? '—',
+                $item['plato_fuerte_nombre'] ?? '—',
+                $item['bebida_nombre'] ?? '—',
+                $item['postre_nombre'] ?? '—',
+                'Q ' . number_format($totalFila, 2),
+                $item['donde_consume'] ?? 'En restaurante',
+                $item['nit_facturacion'] ?? 'C/F',
+            ];
+        }
+
+        $pdf = new PdfWriter('Recuento Consolidado - La Carta');
+        $lineaFecha = 'Fecha Consulta: ' . ($fecha !== '' ? $fecha : 'Histórico General') . ' · Generado: ' . date('d/m/Y H:i');
+        $pdf->addLine($lineaFecha);
+        $pdf->setSummary([
+            'Reservas' => (string) count($filas),
+            'Platillos solicitados' => (string) $totalPlatillos,
+            'Total recaudado' => 'Q ' . number_format($sumaTotal, 2),
+        ]);
+        $pdf->setTable(
+            ['#', 'Comensal', 'Entrada', 'Plato Fuerte', 'Bebida', 'Postre', 'Total', 'Modalidad', 'NIT'],
+            $filasTabla,
+            [25, 75, 70, 80, 55, 55, 45, 65, 45]
+        );
+        $pdf->setColumnAlignments(['center', 'left', 'left', 'left', 'left', 'left', 'right', 'center', 'center']);
+
+        header('Content-Type: application/pdf');
+        $filename = 'Recuento_Consolidado_Carta_' . ($fecha !== '' ? str_replace('-', '', $fecha) : 'General') . '.pdf';
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        echo $pdf->generate();
+        exit;
+    }
+
+    // Compatibilidad: la ruta CSV delega en Excel
+    public function descargarCsv(): void
+    {
+        $this->descargarExcel();
     }
 }

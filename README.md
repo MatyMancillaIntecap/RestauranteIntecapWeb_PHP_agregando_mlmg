@@ -22,6 +22,8 @@ Desarrollado completamente en **PHP 8.2 · MVC · MySQL · PDO · XAMPP · Apach
 11. [Dependencias y versiones](#11-dependencias-y-versiones)
 12. [Separación física del proyecto](#12-separación-física-del-proyecto)
 13. [Matriz de paridad funcional](#13-matriz-de-paridad-funcional)
+14. [Pestañas Marcadas y Adaptación Móvil](#14-novedades-de-diseño-pestañas-marcadas-y-adaptación-móvil--escritorio)
+15. [Mejora Integral de Visibilidad y Organización Visual](#15-mejora-integral-de-visibilidad-límites-y-organización-visual-en-todo-el-sistema)
 
 ---
 
@@ -122,10 +124,13 @@ Credenciales creadas:
 | `roles` | Roles del sistema con límite de almuerzos por rol |
 | `usuarios` | Cuentas con contraseña hasheada en bcrypt |
 | `formas_pago` | Efectivo y Carnet |
-| `menu_diario` | Platillos con stock, precio, imagen y hora de habilitación |
-| `reservas` | Reservas activas y canceladas con NIT de facturación |
+| `menu_diario` | Platillos del almuerzo con stock, precio, imagen y hora de habilitación |
+| `reservas` | Reservas de almuerzos activas y canceladas con NIT de facturación |
 | `historial_login` | Auditoría de cada inicio de sesión |
-| `solicitudes_restablecimiento_password` | Solicitudes de cambio de contraseña |
+| `carta_productos` | Catálogo de productos de **La Carta** (Entrada, Plato fuerte, Bebida, Postre), con precio, stock, días habilitados, fecha opcional, horarios y foto |
+| `carta_reservas` | Registro consolidado de reservas de **La Carta** por usuario, con desglose de ítems, total, consumo y NIT |
+
+> **Nota sobre Solicitudes de Contraseña:** El flujo manual que almacenaba peticiones para atención del administrador en `solicitudes_restablecimiento_password` fue eliminado. Ahora el restablecimiento es automático a `87654321` vía correo SMTP sin intervención administrativa.
 
 ---
 
@@ -169,30 +174,28 @@ El sistema detecta automáticamente si hay sesión activa y redirige al login o 
 
 | Rol | Descripción | Acceso |
 |-----|-------------|--------|
-| **Administrador** | Control total del sistema | Dashboard, usuarios, cocina, reservas, reportes, solicitudes |
-| **Cocina** | Gestión del menú del día | Publicar platillos, ver reservas, reportes de cocina, hacer reserva propia |
-| **Empleado** | Usuario estándar | Reservar almuerzos, ver historial propio |
+| **Administrador** | Control total del sistema | Dashboard, usuarios, cocina, reservas, reportes, **La Carta** (gestión unificada, recuento consolidado y reservas) |
+| **Cocina** | Gestión del menú del día | Publicar platillos del día, ver reservas de cocina, reportes, **La Carta** (visualización y reservas) |
+| **Empleado** | Usuario estándar | Menú del día, historial de reservas, **La Carta** (visualización y reservas con Sí/No) |
 
-Correo: admin@intecap.edu.gt
-Contraseña: 12345678
+Correo: admin@intecap.edu.gt  
+Contraseña inicial: 12345678  
 
-Cocina:
-Correo: cocina@intecap.edu.gt
-Contraseña: 12345678
+Cocina:  
+Correo: cocina@intecap.edu.gt  
+Contraseña inicial: 12345678  
 
-Empleado:
-Correo: empleado@intecap.edu.gt
-Contraseña: 12345678
-
-
+Empleado:  
+Correo: empleado@intecap.edu.gt  
+Contraseña inicial: 12345678  
 
 ### Contraseñas del sistema
 
-| Situación | Contraseña |
-|-----------|-----------|
-| Nuevo usuario creado por admin | `12345678` |
-| Contraseña restablecida por admin | `87654321` |
-| Mínimo para cambio manual | 8 caracteres |
+| Situación | Contraseña | Comportamiento |
+|-----------|-----------|----------------|
+| Nuevo usuario creado por admin | `12345678` | Debe cambiar contraseña al primer ingreso |
+| Restablecimiento automático a solicitud del usuario | `87654321` | Se asigna automáticamente (bcrypt), se envía por correo SMTP y se exige cambio al ingresar |
+| Mínimo para cambio manual | 8 caracteres | Validación de seguridad |
 
 ### Límite de almuerzos por día
 
@@ -210,7 +213,7 @@ Contraseña: 12345678
 |------|-------------|
 | `GET/POST /account/login` | Formulario de inicio de sesión. Redirige según rol. Soporta "Recordarme" (cookie 30 días) |
 | `GET /account/logout` | Cierra la sesión y destruye la cookie |
-| `GET/POST /account/recuperar-password` | Envía solicitud de restablecimiento al administrador |
+| `GET/POST /account/recuperar-password` | Restablece automáticamente la contraseña a `87654321`, envía correo con credenciales y fuerza cambio al ingresar. Rollback automático si falla el envío |
 | `GET/POST /account/cambiar-password` | Cambia la contraseña del usuario autenticado |
 | `GET /account/acceso-denegado` | Pantalla de acceso denegado por rol insuficiente |
 
@@ -218,16 +221,29 @@ Contraseña: 12345678
 
 | Ruta | Descripción |
 |------|-------------|
-| `GET /admin/index` | Dashboard con KPIs: ventas, reservas, platillos dieta/normal, usuarios. Filtrable por rango de fechas |
+| `GET /admin/index` | Dashboard con KPIs: ventas, reservas, platillos dieta/normal, usuarios. Filtrable por rango de fechas. Acceso directo a La Carta |
 | `GET /admin/usuarios` | Lista completa de usuarios. Busqueda por correo. Toggle de activar/desactivar via AJAX |
 | `GET /admin/detalle-usuario/{id}` | Ficha completa: datos del usuario + historial de reservas + totales acumulados |
 | `GET /admin/obtener-usuario-por-id/{id}` | JSON para cargar datos en el modal de edición |
 | `POST /admin/guardar-usuario` | Crear o editar usuario con validaciones del lado servidor |
 | `POST /admin/cambiar-estado-usuario` | Activar o desactivar usuario via AJAX (sin recarga de página) |
-| `GET /admin/solicitudes-restablecimiento` | Lista con secciones Pendientes / Realizadas |
-| `POST /admin/atender-solicitud-restablecimiento` | Confirmar restablecimiento via modal. Asigna `87654321` como temporal |
 | `GET /admin/descargar-reporte-csv` | CSV global de reservas. Filtros: fechas, estado (Activa/Cancelada/Todos) |
 | `GET /admin/descargar-usuarios-csv` | Padrón completo de usuarios en CSV |
+
+### 📖 La Carta (`/carta/`)
+
+| Ruta | Descripción |
+|------|-------------|
+| `GET /carta/index` | Vista cliente / comensal: catálogo organizado por las 4 categorías (Entrada, Plato fuerte, Bebida, Postre). Botones de respuesta **Sí (✓)** y **No (✗)**, visualización clara de unidades disponibles, filtro por horario/stock, desglose en vivo y confirmación de reserva |
+| `GET /carta/admin` | Panel de administración organizado en 2 pestañas: **Catálogo de La Carta** (gestión unificada de las 4 categorías) y **Recuento Consolidado** (métricas, detalle de reservas con filtro de fecha y exportaciones). Enlace a "Ver Vista Cliente" y botón directo para "Realizar Reserva" |
+| `POST /carta/guardar` | Crear o editar producto con subida de imagen, stock disponible, días habilitados, fecha específica opcional y rango horario de atención (solo Administrador) |
+| `GET /carta/obtener-producto-por-id/{id}` | Endpoint JSON para cargar datos en el modal de edición de La Carta |
+| `POST /carta/cambiar-estado` | Toggle AJAX Activo / Inactivo para productos de La Carta |
+| `POST /carta/eliminar` | Eliminación de producto con borrado de su archivo de imagen físico (solo Administrador) |
+| `POST /carta/calcular-total` | Endpoint JSON para validar combinaciones (máx. 1 por categoría) y calcular total exacto |
+| `POST /carta/realizar-reserva` | Registra una reserva en `carta_reservas` y descuenta el stock en transacción segura. Accesible tanto para usuarios como para administradores (pudiendo el admin reservar a su nombre o en nombre de un comensal) |
+| `GET /carta/descargar-excel` | Genera y descarga el reporte consolidado y detalle de reservas de La Carta en formato Excel real (`.xlsx`) |
+| `GET /carta/descargar-pdf` | Genera y descarga el reporte consolidado y detalle de reservas de La Carta en formato PDF nativo (`.pdf`) |
 
 ### 🔥 Cocina (`/cocina/`)
 
@@ -258,32 +274,57 @@ Contraseña: 12345678
 
 ## 8. Reglas de negocio
 
-### Reservas
+### La Carta (Módulo a la carta)
 
-- Solo se muestran platillos con estado `Disponible`, `stock > 0` y `hora_habilitacion <= NOW()`
-- El límite diario se calcula contando reservas **Activas** de platillos **Disponibles**
-- Si un platillo pasa a `Inactivo`, sus reservas se conservan como historial pero el cupo queda libre para que el empleado pueda reservar otro platillo
-- El carrito muestra el contador en tiempo real `(seleccionados / límite máximo)`
-- Validación de NIT: `C/F` o entre 1 y 13 dígitos numéricos
+- **4 Categorías independientes**: Entrada, Plato fuerte, Bebida y Postre.
+- **Selección mediante Sí (✓) / No (✗)**: cada opción presenta únicamente dos respuestas interactivas.
+- **Restricción de selección**: Como máximo **un producto** seleccionado por cada categoría (0 o 1).
+- **Flexibilidad de combinación**: El comensal puede elegir cualquier combinación (ej. Entrada + Plato fuerte + Bebida, o únicamente Plato fuerte, etc.).
+- **Cálculo del total**: En tiempo real y verificado en backend:
+  $$\text{TOTAL} = \text{Entrada} + \text{Plato fuerte} + \text{Bebida} + \text{Postre}$$
+  Las categorías no seleccionadas contabilizan **Q 0.00**.
+- **Control de stock y visibilidad**:
+  - Se muestra claramente el número de unidades disponibles (`stock - cantidad_solicitada`).
+  - Cuando el stock llega a 0, la opción deja de mostrarse a los comensales o queda inhabilitada automáticamente.
+- **Habilitación configurable por días, fechas y horarios**:
+  - El administrador define los días habilitados (ej. "Solo Martes", "Todos los días", etc.), fecha específica opcional y rango horario (ej. `08:00` a `10:00`).
+  - Fuera del horario o día configurado, el producto no aparece disponible para los usuarios.
+- **Panel de Administrador y Recuento Consolidado**:
+  - Panel unificado que muestra todas las categorías juntas sin pestañas redundantes.
+  - El administrador puede registrar reservas tanto directamente desde el panel mediante el modal "Realizar Reserva" como navegando a "Ver Vista Cliente".
+  - Apartado de **Recuento Consolidado** con métricas por producto (stock inicial, solicitados, disponible y recaudación) y tabla detallada de cada reserva.
 
-### Contraseñas
+### Reservas de Menú del Día
 
-- Hash bcrypt con `PASSWORD_BCRYPT` (equivalente a ASP.NET Identity PasswordHasher)
-- Compatibilidad con contraseñas en texto plano heredadas: se validan y migran automáticamente a bcrypt al primer login
-- Cambio de contraseña requiere contraseña actual correcta y mínimo 8 caracteres
-- Las contraseñas nuevas deben coincidir en el campo de confirmación
+- Solo se muestran platillos con estado `Disponible`, `stock > 0` y `hora_habilitacion <= NOW()`.
+- El límite diario se calcula contando reservas **Activas** de platillos **Disponibles**.
+- Si un platillo pasa a `Inactivo`, sus reservas se conservan como historial pero el cupo queda libre para que el empleado pueda reservar otro platillo.
+- El carrito muestra el contador en tiempo real `(seleccionados / límite máximo)`.
+- Validación de NIT: `C/F` o entre 1 y 13 dígitos numéricos.
+
+### Contraseñas y Flujo Automático
+
+- **Restablecimiento automático sin intermediación**:
+  - El usuario ingresa su correo en `/account/recuperar-password`.
+  - El sistema valida la cuenta y restablece la contraseña automáticamente a: `87654321`.
+  - Se almacena con hash seguro bcrypt (`PASSWORD_BCRYPT`).
+  - Se envía automáticamente correo SMTP con el diseño oficial del sistema informando la nueva clave temporal.
+  - Se activa `debe_cambiar_password = 1` para obligar a cambiarla en el siguiente inicio de sesión.
+  - **Manejo seguro de errores**: Si el correo SMTP no puede entregarse, se ejecuta un rollback atómico restaurando el hash anterior sin dejar al usuario bloqueado ni el sistema en estado inconsistente.
+- Hash bcrypt con `PASSWORD_BCRYPT` (compatible con ASP.NET Identity PasswordHasher).
+- Cambio de contraseña requiere contraseña actual correcta y mínimo 8 caracteres.
 
 ### Estado de usuarios (Soft Delete)
 
-- Los usuarios `inactivos` no pueden iniciar sesión
-- Sus registros históricos de reservas se conservan
-- El administrador puede reactivarlos en cualquier momento
+- Los usuarios `inactivos` no pueden iniciar sesión.
+- Sus registros históricos de reservas se conservan.
+- El administrador puede reactivarlos en cualquier momento.
 
 ### Stock de platillos
 
-- Al reservar: `stock -= cantidad` y `cantidad_solicitada += cantidad`
-- Al cancelar: `stock += cantidad` y `cantidad_solicitada -= cantidad`
-- Al eliminar un platillo: solo si no tiene reservas asociadas
+- Al reservar: `stock -= cantidad` y `cantidad_solicitada += cantidad`.
+- Al cancelar: `stock += cantidad` y `cantidad_solicitada -= cantidad`.
+- Al eliminar un platillo: solo si no tiene reservas asociadas.
 
 ---
 
@@ -308,38 +349,42 @@ RestauranteIntecapWeb_PHP/
 │
 ├── controllers/
 │   ├── Controller.php          ← Base: render, redirect, json, flash, input, jsonBody
-│   ├── AccountController.php   ← Login, logout, recuperar/cambiar contraseña
-│   ├── AdminController.php     ← Dashboard, usuarios, solicitudes, reportes CSV
+│   ├── AccountController.php   ← Login, logout, restablecimiento automático y cambio de contraseña
+│   ├── AdminController.php     ← Dashboard, usuarios, reportes CSV
+│   ├── CartaController.php     ← La Carta: panel unificado, selección Sí/No, consolidado, reservas
 │   ├── CocinaController.php    ← Menú, platillos, cambio de estado, exportación
 │   ├── EmpleadoController.php  ← Reservas (carrito JSON), historial, cancelación
 │   └── HomeController.php      ← Redirige a módulo según rol
 │
 ├── models/
-│   └── Entidades.php       ← Clases de datos: Rol, Usuario, MenuDiario, Reserva…
+│   └── Entidades.php       ← Clases de datos: Rol, Usuario, MenuDiario, CartaProducto, CartaReserva…
 │
 ├── services/
 │   ├── Auth.php                ← Autenticación por sesión: login/logout/check/requireRole
-│   ├── AuthService.php         ← Validar credenciales, solicitudes, cambio de contraseña
-│   ├── AdminService.php        ← CRUD usuarios, roles, solicitudes, reportes CSV
+│   ├── AuthService.php         ← Validar credenciales, restablecimiento automático (87654321), cambio contraseña
+│   ├── AdminService.php        ← CRUD usuarios, roles, reportes CSV
+│   ├── CartaService.php        ← CRUD productos La Carta, control días/horarios/stock, reservas y consolidado
 │   ├── CocinaService.php       ← CRUD menú, consolidado, reservas del día, CSV
 │   ├── EmpleadoService.php     ← Menú disponible, reservas, historial, estadísticas KPI
-│   ├── CorreoService.php       ← Notificaciones SMTP
+│   ├── CorreoService.php       ← Notificaciones SMTP con plantillas
 │   ├── SmtpMailer.php           ← Cliente SMTP nativo sin dependencias externas
 │   ├── ExcelWriter.php          ← Generador de reportes XLSX sin dependencias externas
 │   ├── PdfWriter.php            ← Generador de reportes PDF sin dependencias externas
 │
 ├── views/
-│   ├── layout.php              ← HTML base: navbar dinámico por rol, flash messages
+│   ├── layout.php              ← HTML base: navbar dinámico por rol (incluye pestaña "La Carta")
 │   ├── account/
 │   │   ├── login.php               ← Pantalla de login con imagen de fondo INTECAP
-│   │   ├── recuperar_password.php  ← Formulario de solicitud de restablecimiento
+│   │   ├── recuperar_password.php  ← Formulario de solicitud de restablecimiento automático
 │   │   ├── cambiar_password.php    ← Cambiar contraseña propia (autenticado)
 │   │   └── acceso_denegado.php
 │   ├── admin/
-│   │   ├── index.php               ← Dashboard KPIs + filtros avanzados + exportación CSV
+│   │   ├── index.php               ← Dashboard KPIs + filtros avanzados + acceso a La Carta
 │   │   ├── usuarios.php            ← Lista + toggle AJAX + modal crear/editar
-│   │   ├── detalle_usuario.php     ← Ficha completa + historial del usuario
-│   │   └── solicitudes_restablecimiento.php  ← Secciones Pendientes/Realizadas + modal
+│   │   └── detalle_usuario.php     ← Ficha completa + historial del usuario
+│   ├── carta/
+│   │   ├── index.php               ← Vista cliente: opciones con botones Sí (✓) / No (✗), stock y total en vivo
+│   │   └── admin.php               ← Panel de administración: catálogo unificado, habilitación, consolidado y reservas
 │   ├── cocina/
 │   │   └── index.php               ← 3 pestañas: Menú / Consolidado / Detalle reservas
 │   ├── empleado/
@@ -497,21 +542,19 @@ Comparación entre el sistema original C# (ASP.NET Core MVC + SQL Server) y esta
 | Solicitar restablecimiento de contraseña | ✅ | ✅ | **COMPLETO** |
 | Cambiar contraseña (usuario autenticado) | ✅ | ✅ | **COMPLETO** |
 | Registro de historial_login por sesión | ✅ | ✅ | **COMPLETO** |
-| Dashboard Admin con KPIs por rango fechas | ✅ | ✅ | **COMPLETO** |
-| KPIs: ventas, reservas, platillos dieta/normal | ✅ | ✅ | **COMPLETO** |
-| Contador de solicitudes pendientes en navbar | ✅ | ✅ | **COMPLETO** |
+| Restablecimiento automático de contraseña (87654321 + SMTP + Rollback) | N/A (Manual en C#) | ✅ | **OPTIMIZADO** |
+| Módulo La Carta: panel unificado con todas las categorías juntas | N/A | ✅ | **NUEVO** |
+| Módulo La Carta: control de stock y habilitación por horario y días | N/A | ✅ | **NUEVO** |
+| Módulo La Carta: recuento consolidado y detalle de reservas | N/A | ✅ | **NUEVO** |
+| Módulo La Carta: reserva directa desde admin y vista cliente | N/A | ✅ | **NUEVO** |
+| Módulo La Carta: selección interactiva Sí (✓) / No (✗) con stock visible | N/A | ✅ | **NUEVO** |
+| Módulo La Carta: regla máx. 1 por categoría y total automático | N/A | ✅ | **NUEVO** |
+| Módulo La Carta: ocultamiento automático al agotarse stock o por horario | N/A | ✅ | **NUEVO** |
 | Lista de usuarios con búsqueda por correo | ✅ | ✅ | **COMPLETO** |
 | Crear usuario (contraseña inicial 12345678) | ✅ | ✅ | **COMPLETO** |
 | Editar usuario (modal, sin cambiar contraseña) | ✅ | ✅ | **COMPLETO** |
 | Toggle activar/desactivar usuario via AJAX | ✅ | ✅ | **COMPLETO** |
 | Ficha detallada de usuario + historial completo | ✅ | ✅ | **COMPLETO** |
-| Solicitudes restablecimiento: sección Pendientes | ✅ | ✅ | **COMPLETO** |
-| Solicitudes restablecimiento: sección Realizadas | ✅ | ✅ | **COMPLETO** |
-| Modal de confirmación para restablecer contraseña | ✅ | ✅ | **COMPLETO** |
-| Contraseña temporal fija al restablecer (87654321) | ✅ | ✅ | **COMPLETO** |
-| Exportar padrón de usuarios (CSV / Excel) | ✅ CSV | ✅ CSV | **COMPLETO** |
-| Reporte global de reservas con filtros | ✅ Excel+PDF | ✅ CSV | **COMPLETO** |
-| Filtros de reporte: fechas, estado, usuario, platillo | ✅ | ✅ | **COMPLETO** |
 | Pestaña Gestión de Menú en Cocina | ✅ | ✅ | **COMPLETO** |
 | Formulario lateral para nuevo platillo | ✅ | ✅ | **COMPLETO** |
 | Modal de edición de platillo existente | ✅ | ✅ | **COMPLETO** |
@@ -547,15 +590,86 @@ Comparación entre el sistema original C# (ASP.NET Core MVC + SQL Server) y esta
 | Registro de auditoría de logins | ✅ | ✅ | **COMPLETO** |
 | Desacoplamiento completo (sin dependencias C#) | ✅ | ✅ | **COMPLETO** |
 
+| Pestañas de navegación de alto contraste y relieve (Cocina y La Carta) | N/A | ✅ | **NUEVO** |
+| Diseño responsivo total para móviles (smartphones) y computadoras | Parcial | ✅ | **OPTIMIZADO** |
+| Barra flotante móvil para La Carta con total en tiempo real y salto al resumen | N/A | ✅ | **NUEVO** |
+| Menú desplegable móvil optimizado como panel táctil | Básico | ✅ | **OPTIMIZADO** |
+
 **Diferencias intencionales (no faltantes):**
 
 | Aspecto | C# | PHP | Motivo |
 |---------|-----|-----|--------|
-| Exportación Excel/PDF | ClosedXML + QuestPDF | CSV nativo PHP | Sin dependencias externas en PHP |
+| Exportación Excel/PDF | ClosedXML + QuestPDF | ExcelWriter nativo (.xlsx) + PdfWriter (.pdf) | Compatibilidad total y descarga directa |
 | Motor de base de datos | SQL Server | MySQL | Requerimiento del proyecto PHP |
 | Autenticación | ASP.NET Identity Cookies | Sesiones PHP nativas | Equivalente funcional |
 | Hash de contraseñas | PasswordHasher (PBKDF2) | password_hash() (bcrypt) | Igualmente seguro |
 
 ---
 
-*Documentación generada — Proyecto Restaurante Escuela INTECAP · PHP 8.2 MVC · Completamente independiente*
+## 14. Novedades de Diseño: Pestañas Marcadas y Adaptación Móvil / Escritorio
+
+### 🌟 Pestañas de Navegación Marcadas ("Alto Contraste y Relieve")
+1. **Contenedor Tray**: Fondo slate suave (`#e9eef5`), borde perimetral (`#cbd5e1`), esquinas curvas de 14px y espaciado de 8px entre pestañas.
+2. **Pestaña Activa**: Destaca de forma rotunda e inconfundible con el degradado oficial INTECAP (`linear-gradient(135deg, #123d6b 0%, #0d6efd 100%)`), texto blanco puro, tipografía negrita (`font-weight: 700`), elevación suave y sombra tridimensional (`box-shadow: 0 4px 14px rgba(13, 110, 253, 0.35)`).
+3. **Pestañas Inactivas**: Texto pizarra oscuro de alta legibilidad (`#334155`), fondo blanco limpio con animación al pasar el cursor (hover).
+4. **Contadores e Insignias (`tab-badge`)**: Integrados armoniosamente con fondos translúcidos en tabs activos y contraste sólido en tabs inactivos.
+
+### 📱 Experiencia Responsive Multiplataforma (Móvil + Computadora)
+1. **Pestañas en Smartphones (`<= 768px`)**: En teléfonos móviles, las pestañas cambian automáticamente a disposición vertical de 100% de ancho, con altura táctil mínima de 48px para facilitar la interacción con los dedos sin textos comprimidos.
+2. **Navbar Móvil (Drawer Táctil)**: En pantallas pequeñas (`< 992px`), el menú colapsable se despliega como un panel flotante azul noche (`#10335a`), con botones alargados de fácil toque y perfil de usuario integrado.
+3. **Barra Flotante Fija en La Carta**: En smartphones, los comensales disponen de una barra fija inferior con efecto translúcido que muestra el total acumulado en tiempo real y el botón `🍽️ Ver Resumen` con desplazamiento suave hacia la confirmación.
+4. **Tablas y Formularios**: Desplazamiento táctil fluido `-webkit-overflow-scrolling: touch`, modales centrados a pantalla completa móvil y botones de acción con dimensiones ergonómicas mínimas.
+
+---
+
+## 15. Mejora Integral de Visibilidad, Límites y Organización Visual en Todo el Sistema
+
+Se llevó a cabo una renovación visual integral en todas las pantallas y componentes del sistema para erradicar elementos desvanecidos, límites ambiguos o información amontonada:
+
+### 1. Límites Claramente Visibles en Ventanas, Tarjetas y Módulos
+- **Bordes Perimetrales Reforzados**: En `site.css`, la variable `--intecap-border` se fijó en `#cbd5e1` (pizarra visible). Se eliminaron clases `border-0` que desdibujaban componentes, dotando a las tarjetas (`.card`), modales y contenedores de un borde perimetral firme de `1.5px solid #cbd5e1 !important` complementado con sombra tridimensional suave (`box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08)`).
+- **Acentos Institucionales en Cabeceras**: Los paneles y módulos principales ahora lucen una franja izquierda sólida (`border-left: 5px solid var(--intecap-primary)`), enmarcando de manera inconfundible la temática de cada sección.
+- **Modales Estructurados**: Las ventanas modales cuentan con bordes firmes de `2px solid #94a3b8`, cabeceras en degradado azul marino y pie de página separado con fondo tenue y borde superior visible.
+
+### 2. Separación Visual entre Pestañas, Formularios, Filtros y Secciones
+- **Aislamiento de Formularios y Filtros**:
+  - El buscador de usuarios (`/admin/usuarios`) y los filtros por rango de fechas del dashboard (`/admin/index`) fueron extraídos de espacios planos e integrados dentro de tarjetas dedicadas con cabecera, ícono y bordes nítidos.
+  - El formulario de registro de platillos en Cocina y el formulario de cambio de contraseña (`/account/cambiar-password`) ahora cuentan con una estructura encuadrada que los separa claramente de las tablas adyacentes.
+- **Campos de Entrada y Selectores Notables**: Inputs y selects utilizan bordes de `1.5px solid #cbd5e1`, esquinas de 8px, etiquetas en negrita azul institucional (`#123d6b`) y un halo azul al enfocar (`box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.18)`).
+
+### 3. Botones Fáciles de Identificar, Diferenciar y con Jerarquía Clara
+- **Eliminación de Íconos Ambiguos en Tablas**: En las tablas de Cocina y Administración, los botones que sólo mostraban emojis pequeños fueron reemplazados por botones estilizados con texto y color funcional explícito:
+  - `✏️ Editar` (Celeste / Información)
+  - `🚫 Pausar` / `✅ Activar` (Ámbar Advertencia / Verde Éxito)
+  - `🗑️ Borrar` (Rojo Rubí Peligro)
+- **Paleta de Botones con Alto Contraste**:
+  - **Primario (`.btn-primary`)**: Azul INTECAP (`#123d6b`) para acciones de confirmación y guardado.
+  - **Éxito (`.btn-success`)**: Verde esmeralda (`#198754`) para descargas Excel y activación.
+  - **Peligro (`.btn-danger`)**: Rojo rubí (`#dc3545`) para cancelaciones y eliminaciones.
+  - **Advertencia (`.btn-warning`)**: Ámbar dorado (`#d97706`) con texto blanco para pausas y precauciones.
+  - **Efecto de Micro-Elevación**: Transición suave con elevación de 1px al pasar el cursor y feedback táctil inmediato.
+
+### 4. Distribución Amplia y sin Amontonamientos (Espaciado y Tipografía)
+- **Tablas Espaciosas y Legibles**:
+  - Celdas con acolchado ampliado a `0.95rem 1rem !important`.
+  - Encabezados de tabla (`<thead>`) con fondo pizarra suave (`#f1f5f9`), borde inferior de `2px solid #cbd5e1`, tipografía en mayúsculas compactas de alto contraste y esquinas superiores redondeadas.
+  - Filas con separación sutil y efecto hover iluminado en azul tenue (`#f1f7ff`).
+- **Acentos Cromáticos por Categoría en La Carta**:
+  - Las secciones de Entrada, Plato fuerte, Bebida y Postre poseen un borde superior de 4px con su color temático correspondiente (Ámbar, Esmeralda, Cian, Magenta) e insignias destacadas, permitiendo al usuario identificar cada tiempo de comida de un vistazo.
+- **Tarjetas de Métricas del Dashboard Renovadas**:
+  - Se sustituyeron fondos de colores pasteles planos por tarjetas blancas con acento lateral de color, badges institucionales, números grandes y legibles, y círculos para íconos que previenen la fatiga visual.
+
+### 5. Resumen de Pantallas Intervenidas
+1. `views/admin/index.php`: Métricas KPI con bordes y acentos laterales, formulario de filtros enmarcado.
+2. `views/admin/usuarios.php`: Barra de búsqueda dentro de tarjeta de filtro, encabezado temático de padrón.
+3. `views/cocina/index.php`: Pestañas enmarcadas, botones de acción en tabla con texto descriptivo, formulario aislado.
+4. `views/carta/admin.php`: Categorías con acento superior de color, tablas de recuento y catálogo delimitadas.
+5. `views/carta/index.php`: Separadores por categoría de comida, panel de resumen lateral contrastado.
+6. `views/empleado/index.php`: Tarjetas de platillos con bordes marcados y carrito lateral enmarcado.
+7. `views/empleado/historial.php`: Cabecera descriptiva, tabla de reservas holgada y badge de estado nítidos.
+8. `views/account/cambiar_password.php`: Formulario central enmarcado en tarjeta con cabecera azul institucional.
+9. `views/layout.php` & `public/css/site.css`: Reglas globales de bordes, sombras, botones, tablas y modales.
+
+---
+
+*Documentación generada — Proyecto Restaurante Escuela INTECAP · PHP 8.2 MVC · Completamente independiente y adaptado a dispositivos móviles y de escritorio*

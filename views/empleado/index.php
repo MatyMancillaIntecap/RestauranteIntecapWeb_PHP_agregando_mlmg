@@ -11,13 +11,16 @@
 ?>
 <div class="container mt-3 mb-5">
 
-    <!-- ENCABEZADO -->
-    <div class="row align-items-center mb-4">
-        <div class="col-md-8 col-12">
-            <h3 class="text-primary fw-bold">🍽️ Menú del Día (<?= date('d/m/Y') ?>)</h3>
-            <p class="text-muted mb-0">
+    <!-- // BARRA SUPERIOR CON COLORES FUERTES INTECAP -->
+    <div class="card shadow mb-4 rounded-3 text-white"
+         style="background: linear-gradient(135deg, #0a2540 0%, #123d6b 50%, #1e40af 100%); border: 2.5px solid #0f2b48 !important;">
+        <div class="card-body p-4">
+            <h3 class="text-white fw-bold mb-1 d-flex align-items-center gap-2">
+                <span>🍽️</span> Menú del Día (<?= date('d/m/Y') ?>)
+            </h3>
+            <p class="text-white-50 mb-0">
                 Selecciona hasta un máximo de
-                <strong><?= (int)$limite_maximo === 0 ? 'ilimitado' : (int)$limite_maximo ?></strong>
+                <strong class="text-white"><?= (int)$limite_maximo === 0 ? 'ilimitado' : (int)$limite_maximo ?></strong>
                 almuerzos por día e indica la forma de pago para cada uno.
             </p>
         </div>
@@ -46,7 +49,7 @@
 
                 <?php foreach ($menus as $m): ?>
                     <div class="col-md-6 col-12 mb-4">
-                        <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                        <div class="card h-100 shadow-sm rounded-3 overflow-hidden">
                             <?php if (!empty($m['imagen_url'])): ?>
                                 <img src="<?= resolve_image_url($m['imagen_url']) ?>"
                                      class="card-img-top" style="height:180px;object-fit:cover;"
@@ -122,16 +125,18 @@
             </div>
         </div>
 
-        <!-- PANEL LATERAL: CARRITO -->
+        <!-- PANEL LATERAL: CARRITO ENMARCADO -->
         <div class="col-lg-4 col-12">
-            <div class="card shadow-sm border-0 rounded-3 sticky-top" style="top:20px;">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">
-                        🛍️ Mi Solicitud
-                        (<span id="countPlatillos">0</span>/<?= (int)$limite_maximo === 0 ? '∞' : (int)$limite_maximo ?>)
+            <div class="card shadow rounded-3 sticky-top border-2" style="top:20px;">
+                <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #0a2540 0%, #123d6b 50%, #1e40af 100%) !important;">
+                    <h5 class="mb-0 fw-bold d-flex justify-content-between align-items-center">
+                        <span>🛍️ Mi Solicitud</span>
+                        <span class="badge bg-warning text-dark fw-bold shadow-sm">
+                            <span id="countPlatillos">0</span>/<?= (int)$limite_maximo === 0 ? '∞' : (int)$limite_maximo ?>
+                        </span>
                     </h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     <div id="listaCarrito" class="mb-3">
                         <p class="text-muted text-center py-3">No has seleccionado platillos aún.</p>
                     </div>
@@ -145,13 +150,16 @@
 
                     <hr>
 
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="fw-bold fs-5">Total a Pagar:</span>
-                        <span id="totalPagar" class="fw-bold fs-5 text-success">Q 0.00</span>
+                    <!-- TOTAL A PAGAR ENMARCADO CON COLOR FUERTE -->
+                    <div class="p-3 rounded-3 text-center mb-3 text-white shadow-sm"
+                         style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border: 2px solid #047857;">
+                        <span class="text-uppercase small fw-bold text-white-50 d-block" style="letter-spacing: 1px;">TOTAL A PAGAR</span>
+                        <div id="totalPagar" class="fs-2 fw-bold text-white mt-1">Q 0.00</div>
                     </div>
 
-                    <button id="btnConfirmar" class="btn btn-success w-100 fw-bold fs-6"
-                            onclick="confirmarReserva()" disabled>
+                    <button id="btnConfirmar" class="btn btn-success w-100 fw-bold fs-6 py-2 shadow"
+                            onclick="confirmarReserva()" disabled
+                            style="background: linear-gradient(135deg, #15803d 0%, #16a34a 100%) !important; border: 2px solid #14532d;">
                         ✅ Confirmar Reserva
                     </button>
                 </div>

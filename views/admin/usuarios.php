@@ -9,26 +9,29 @@
 ?>
 <div class="container-fluid mt-3 mb-5">
 
-    <!-- BARRA SUPERIOR -->
-    <div class="card shadow-sm border-0 mb-4 rounded-3">
-        <div class="card-body bg-light p-3">
+    <!-- // BARRA SUPERIOR CON COLORES FUERTES INTECAP -->
+    <div class="card shadow mb-4 rounded-3 text-white"
+         style="background: linear-gradient(135deg, #0a2540 0%, #123d6b 50%, #1e40af 100%); border: 2.5px solid #0f2b48 !important;">
+        <div class="card-body p-4">
             <div class="row align-items-center">
                 <div class="col-md-6 col-12">
-                    <h3 class="text-primary fw-bold mb-1">⚙️ Gestión General de Usuarios</h3>
-                    <p class="text-muted mb-0">
+                    <h3 class="text-white fw-bold mb-1 d-flex align-items-center gap-2">
+                        <span>⚙️</span> Gestión General de Usuarios
+                    </h3>
+                    <p class="text-white-50 mb-0">
                         Administra accesos, roles, estados, límites de platillos y NITs del personal.
                     </p>
                 </div>
                 <div class="col-md-6 col-12 text-md-end mt-2 mt-md-0 d-flex gap-2 justify-content-md-end flex-wrap">
                     <a href="<?= BASE_URL ?>/admin/descargar-usuarios-excel"
-                       class="btn btn-success fw-bold">
+                       class="btn btn-success fw-bold shadow-sm">
                         📊 Exportar Excel
                     </a>
                     <a href="<?= BASE_URL ?>/admin/descargar-usuarios-pdf"
-                       class="btn btn-outline-danger fw-bold">
+                       class="btn btn-danger fw-bold shadow-sm">
                         📄 PDF
                     </a>
-                    <button class="btn btn-primary fw-bold" onclick="abrirModalNuevoUsuario()">
+                    <button class="btn btn-warning text-dark fw-bold shadow-sm" onclick="abrirModalNuevoUsuario()">
                         ➕ Crear Nuevo Usuario
                     </button>
                 </div>
@@ -36,25 +39,39 @@
         </div>
     </div>
 
-    <!-- BUSCADOR POR CORREO -->
-    <div class="row mb-3">
-        <div class="col-md-6 col-12">
-            <form method="get" action="<?= BASE_URL ?>/admin/usuarios" class="d-flex gap-2">
-                <input type="email" name="correo" class="form-control"
-                       placeholder="Buscar por correo electrónico..."
-                       value="<?= htmlspecialchars($email_busqueda ?? '') ?>">
-                <button type="submit" class="btn btn-outline-primary">Buscar</button>
-                <a href="<?= BASE_URL ?>/admin/usuarios" class="btn btn-outline-secondary">Limpiar</a>
+    <!-- // BUSCADOR POR CORREO ENMARCADO CON COLOR -->
+    <div class="card shadow-sm mb-4 rounded-3 border-2" style="background: #f8fafc; border: 2px solid #cbd5e1 !important;">
+        <div class="card-body p-3">
+            <form method="get" action="<?= BASE_URL ?>/admin/usuarios" class="row g-2 align-items-center">
+                <div class="col-md-6 col-12">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-2">🔍</span>
+                        <input type="email" name="correo" class="form-control"
+                               placeholder="Buscar usuario por correo electrónico..."
+                               value="<?= htmlspecialchars($email_busqueda ?? '') ?>">
+                    </div>
+                </div>
+                <div class="col-md-6 col-12 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary fw-bold shadow-sm">Buscar</button>
+                    <a href="<?= BASE_URL ?>/admin/usuarios" class="btn btn-outline-secondary fw-bold">Limpiar Filtro</a>
+                </div>
             </form>
         </div>
     </div>
 
-    <!-- TABLA DE USUARIOS -->
-    <div class="card shadow-sm border-0 rounded-3">
+    <!-- // TABLA DE USUARIOS CON ENCABEZADO VIBRANTE -->
+    <div class="card shadow rounded-3 border-2">
+        <div class="card-header text-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2"
+             style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;">
+            <h5 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                <span>👥</span> Padrón General de Usuarios Registrados
+            </h5>
+            <span class="badge bg-warning text-dark fw-bold shadow-sm"><?= count($usuarios) ?> usuarios</span>
+        </div>
         <div class="card-body p-0">
-            <div class="table-responsive">
+            <div class="table-responsive border-0">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th>Nombre Completo</th>
                             <th>Correo Electrónico</th>
@@ -80,7 +97,14 @@
                                 </td>
                                 <td><?= htmlspecialchars($u['email']) ?></td>
                                 <td>
-                                    <span class="badge bg-info text-dark">
+                                    <?php
+                                    $bgRol = match($u['nombre_rol']) {
+                                        'Administrador' => 'background: #7c3aed; color: #fff;',
+                                        'Cocina'        => 'background: #ea580c; color: #fff;',
+                                        default         => 'background: #0284c7; color: #fff;',
+                                    };
+                                    ?>
+                                    <span class="badge fw-bold shadow-sm" style="<?= $bgRol ?>">
                                         <?= htmlspecialchars($u['nombre_rol']) ?>
                                     </span>
                                 </td>

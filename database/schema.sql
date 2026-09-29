@@ -75,16 +75,39 @@ CREATE TABLE IF NOT EXISTS historial_login (
     CONSTRAINT fk_historial_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 ) ENGINE=InnoDB;
 
--- Tabla carta_productos (La Carta: Entrada, Plato fuerte, Bebida, Postre)
+-- Tabla carta_productos (La Carta: Entrada, Plato fuerte, Bebida, Postre con stock y horario)
 CREATE TABLE IF NOT EXISTS carta_productos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     categoria VARCHAR(50) NOT NULL,
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT NULL,
     precio DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    stock INT NOT NULL DEFAULT 10,
+    cantidad_solicitada INT NOT NULL DEFAULT 0,
     imagen VARCHAR(255) NULL,
+    dias_habilitados VARCHAR(150) NOT NULL DEFAULT 'Todos',
+    fecha_habilitacion DATE NULL,
+    hora_inicio TIME NOT NULL DEFAULT '00:00:00',
+    hora_fin TIME NOT NULL DEFAULT '23:59:59',
     estado TINYINT(1) NOT NULL DEFAULT 1,
     creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- Tabla carta_reservas (Registro y recuento de reservas realizadas desde La Carta)
+CREATE TABLE IF NOT EXISTS carta_reservas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    entrada_id INT NULL,
+    plato_fuerte_id INT NULL,
+    bebida_id INT NULL,
+    postre_id INT NULL,
+    total DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    fecha_reserva DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_consumo DATE NOT NULL,
+    donde_consume VARCHAR(50) NOT NULL DEFAULT 'En restaurante',
+    estado VARCHAR(20) NOT NULL DEFAULT 'Activa',
+    nit_facturacion VARCHAR(20) NOT NULL DEFAULT 'C/F',
+    CONSTRAINT fk_carta_reservas_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 ) ENGINE=InnoDB;
 
 -- Nota: El flujo antiguo de solicitudes manuales a través de la tabla solicitudes_restablecimiento_password

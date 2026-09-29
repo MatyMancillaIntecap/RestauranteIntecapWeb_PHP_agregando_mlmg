@@ -10,28 +10,31 @@
 ?>
 <div class="container-fluid mt-3 mb-5">
 
-    <!-- BARRA SUPERIOR -->
-    <div class="card shadow-sm border-0 mb-4 rounded-3">
-        <div class="card-body bg-light rounded-3 p-3">
+    <!-- // BARRA SUPERIOR CON COLORES FUERTES INTECAP -->
+    <div class="card shadow mb-4 rounded-3 text-white"
+         style="background: linear-gradient(135deg, #0a2540 0%, #123d6b 50%, #1e40af 100%); border: 2.5px solid #0f2b48 !important;">
+        <div class="card-body p-4">
             <div class="row align-items-center">
                 <div class="col-md-5 col-12">
-                    <h3 class="text-primary fw-bold mb-1">👨‍🍳 Área de Cocina</h3>
-                    <p class="text-muted mb-0">Gestión de platillos, consolidado de pedidos y descarga de reportes.</p>
+                    <h3 class="text-white fw-bold mb-1 d-flex align-items-center gap-2">
+                        <span>👨‍🍳</span> Área de Cocina
+                    </h3>
+                    <p class="text-white-50 mb-0">Gestión de platillos, consolidado de pedidos y descarga de reportes.</p>
                 </div>
                 <div class="col-md-7 col-12 mt-3 mt-md-0">
                     <form method="get" action="<?= BASE_URL ?>/cocina/index"
                           class="d-flex align-items-center justify-content-md-end gap-2 flex-wrap">
-                        <label class="fw-bold text-nowrap">Fecha Consulta:</label>
-                        <input type="date" name="fecha" class="form-control w-auto"
+                        <label class="fw-bold text-nowrap text-white">Fecha Consulta:</label>
+                        <input type="date" name="fecha" class="form-control form-control-sm w-auto"
                                value="<?= htmlspecialchars($fecha_consulta) ?>"
                                onchange="this.form.submit()">
                         <div class="d-flex gap-2">
                             <a href="<?= BASE_URL ?>/cocina/descargar-excel?fecha=<?= urlencode($fecha_consulta) ?>"
-                               class="btn btn-success fw-bold text-nowrap">
+                               class="btn btn-success fw-bold text-nowrap shadow-sm">
                                 📊 Excel
                             </a>
                             <a href="<?= BASE_URL ?>/cocina/descargar-pdf?fecha=<?= urlencode($fecha_consulta) ?>"
-                               class="btn btn-outline-danger fw-bold text-nowrap">
+                               class="btn btn-danger fw-bold text-nowrap shadow-sm">
                                 📄 PDF
                             </a>
                         </div>
@@ -48,7 +51,8 @@
     foreach ($consolidado as $c) { $totalConsolidado += (int)$c['total_solicitado']; }
     $totalReservas = count($reservas_detalle);
     ?>
-    <ul class="nav nav-tabs nav-justified mb-4 fw-bold" id="cocinaTabs" role="tablist">
+    <!-- // PESTAÑAS DE NAVEGACIÓN MARCADAS (COCINA) -->
+    <ul class="nav nav-tabs nav-justified mb-4 fw-bold shadow-sm" id="cocinaTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="menu-tab" data-bs-toggle="tab"
                     data-bs-target="#tab-menu" type="button" role="tab">
@@ -58,13 +62,13 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="consolidado-tab" data-bs-toggle="tab"
                     data-bs-target="#tab-consolidado" type="button" role="tab">
-                📊 Recuento Consolidado (<?= $totalConsolidado ?>)
+                📊 Recuento Consolidado <span class="badge rounded-pill tab-badge ms-1"><?= $totalConsolidado ?></span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="reservas-tab" data-bs-toggle="tab"
                     data-bs-target="#tab-reservas" type="button" role="tab">
-                👥 Detalle de Reservas (<?= $totalReservas ?>)
+                👥 Detalle de Reservas <span class="badge rounded-pill tab-badge ms-1"><?= $totalReservas ?></span>
             </button>
         </li>
     </ul>
@@ -77,11 +81,11 @@
         <div class="tab-pane fade show active" id="tab-menu" role="tabpanel">
             <div class="row">
 
-                <!-- Formulario lateral de NUEVO PLATILLO -->
+                <!-- Formulario lateral de NUEVO PLATILLO CON ENCABEZADO CÁLIDO VIBRANTE -->
                 <div class="col-lg-4 col-12 mb-4">
-                    <div class="card shadow-sm border-0 rounded-3">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">➕ Publicar Opción del Día</h5>
+                    <div class="card shadow rounded-3 border-2">
+                        <div class="card-header text-white" style="background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;">
+                            <h5 class="mb-0 fw-bold">➕ Publicar Opción del Día</h5>
                         </div>
                         <div class="card-body">
                             <form method="post" action="<?= BASE_URL ?>/cocina/guardar-menu"
@@ -145,9 +149,9 @@
 
                 <!-- Tabla de platillos registrados -->
                 <div class="col-lg-8 col-12">
-                    <div class="card shadow-sm border-0 rounded-3">
-                        <div class="card-header bg-dark text-white">
-                            <h5 class="mb-0">📋 Platillos Registrados</h5>
+                    <div class="card shadow rounded-3 border-2">
+                        <div class="card-header text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;">
+                            <h5 class="mb-0 fw-bold">📋 Platillos Registrados</h5>
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive">
@@ -214,24 +218,30 @@
                                                         <?= (int)$m['stock'] ?> / <?= (int)$m['stock'] + (int)$m['cantidad_solicitada'] ?>
                                                     </span>
                                                 </td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary me-1"
+                                                <td class="text-nowrap">
+                                                    <button class="btn btn-sm btn-outline-primary fw-bold me-1"
                                                             onclick="abrirModalEditar(<?= (int)$m['id'] ?>)"
-                                                            title="Editar">
-                                                        ✏️
+                                                            title="Editar Platillo">
+                                                        ✏️ Editar
                                                     </button>
                                                     <?php if ($m['estado'] === 'Disponible'): ?>
-                                                        <button class="btn btn-sm btn-outline-warning me-1"
+                                                        <button class="btn btn-sm btn-outline-warning fw-bold me-1"
                                                                 onclick="cambiarEstadoPlatillo(<?= (int)$m['id'] ?>, 'Inactivo')"
-                                                                title="Deshabilitar">🚫</button>
+                                                                title="Deshabilitar Platillo">
+                                                            🚫 Pausar
+                                                        </button>
                                                     <?php else: ?>
-                                                        <button class="btn btn-sm btn-outline-success me-1"
+                                                        <button class="btn btn-sm btn-outline-success fw-bold me-1"
                                                                 onclick="cambiarEstadoPlatillo(<?= (int)$m['id'] ?>, 'Disponible')"
-                                                                title="Habilitar">✅</button>
+                                                                title="Habilitar Platillo">
+                                                            ✅ Activar
+                                                        </button>
                                                     <?php endif; ?>
-                                                    <button class="btn btn-sm btn-outline-danger"
+                                                    <button class="btn btn-sm btn-outline-danger fw-bold"
                                                             onclick="eliminarMenu(<?= (int)$m['id'] ?>)"
-                                                            title="Eliminar">🗑️</button>
+                                                            title="Eliminar Platillo">
+                                                        🗑️ Borrar
+                                                    </button>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -248,9 +258,9 @@
              PESTAÑA 2 — RECUENTO CONSOLIDADO
         ═══════════════════════════════════════════════════════ -->
         <div class="tab-pane fade" id="tab-consolidado" role="tabpanel">
-            <div class="card shadow-sm border-0 rounded-3">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">📊 Consolidados por Platillo Solicitado</h5>
+            <div class="card shadow rounded-3 border-2">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;">
+                    <h5 class="mb-0 fw-bold">📊 Consolidados por Platillo Solicitado</h5>
                 </div>
                 <div class="card-body">
                     <?php if (!empty($consolidado)): ?>
@@ -258,20 +268,20 @@
                             <?php foreach ($consolidado as $c): ?>
                                 <?php $inactivo = ($c['estado_platillo'] === 'Inactivo'); ?>
                                 <div class="col-md-4 col-12 mb-3">
-                                    <div class="card <?= $inactivo ? 'border-warning' : 'border-primary' ?> h-100 shadow-sm">
+                                    <div class="card <?= $inactivo ? 'border-warning' : 'border-success' ?> h-100 shadow-sm" style="border: 2px solid <?= $inactivo ? '#f59e0b' : '#10b981' ?> !important;">
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-start">
-                                                <h5 class="card-title fw-bold <?= $inactivo ? 'text-warning' : 'text-primary' ?>">
+                                                <h5 class="card-title fw-bold <?= $inactivo ? 'text-warning' : 'text-success' ?>">
                                                     <?= htmlspecialchars($c['nombre_plato']) ?>
                                                 </h5>
                                                 <?php if ($inactivo): ?>
-                                                    <span class="badge bg-warning text-dark">⚠️ Deshabilitado</span>
+                                                    <span class="badge bg-warning text-dark shadow-sm">⚠️ Deshabilitado</span>
                                                 <?php else: ?>
-                                                    <span class="badge bg-success">✅ Activo</span>
+                                                    <span class="badge bg-success shadow-sm">✅ Activo</span>
                                                 <?php endif; ?>
                                             </div>
                                             <?php if ($c['es_dieta']): ?>
-                                                <span class="badge bg-info text-dark mb-2">🌿 Dieta</span>
+                                                <span class="badge bg-info text-white mb-2 shadow-sm">🌿 Dieta</span>
                                             <?php endif; ?>
                                             <p class="text-muted mb-1">
                                                 Precio Unitario: Q <?= number_format((float)$c['precio'], 2) ?>
@@ -283,14 +293,14 @@
                                             <?php endif; ?>
                                             <hr>
                                             <div class="d-flex justify-content-between align-items-center">
-                                                <span class="fs-6 text-secondary">Solicitudes:</span>
-                                                <span class="badge bg-success fs-5">
+                                                <span class="fs-6 text-secondary fw-bold">Solicitudes:</span>
+                                                <span class="badge bg-success fs-5 shadow-sm">
                                                     <?= (int)$c['total_solicitado'] ?> unidades
                                                 </span>
                                             </div>
                                             <div class="d-flex justify-content-between align-items-center mt-2">
-                                                <span class="fs-6 text-secondary">Total Acumulado:</span>
-                                                <span class="fw-bold text-dark fs-5">
+                                                <span class="fs-6 text-secondary fw-bold">Total Acumulado:</span>
+                                                <span class="fw-bold text-success fs-4">
                                                     Q <?= number_format((float)$c['total_recaudado'], 2) ?>
                                                 </span>
                                             </div>
@@ -312,9 +322,9 @@
              PESTAÑA 3 — DETALLE DE RESERVAS
         ═══════════════════════════════════════════════════════ -->
         <div class="tab-pane fade" id="tab-reservas" role="tabpanel">
-            <div class="card shadow-sm border-0 rounded-3">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">👥 Detalle de Personas que Reservaron</h5>
+            <div class="card shadow rounded-3 border-2">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%) !important;">
+                    <h5 class="mb-0 fw-bold">👥 Detalle de Personas que Reservaron</h5>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">

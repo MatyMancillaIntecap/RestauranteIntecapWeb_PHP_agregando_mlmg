@@ -16,7 +16,6 @@
     <title>Restaurante Escuela INTECAP</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="<?= BASE_URL ?>/css/site.css" rel="stylesheet">
     <style>
         .navbar-custom        { background-color: #215ca8 !important; padding: .75rem 1rem; }
         .nav-btn              {
@@ -52,6 +51,8 @@
             line-height: 1;
         }
     </style>
+    <!-- // Hoja de estilos del sistema con soporte responsivo y pestañas destacadas -->
+    <link href="<?= BASE_URL ?>/css/site.css" rel="stylesheet">
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
 
@@ -98,9 +99,9 @@
                                     <i class="bi bi-journal-text"></i> Mi Historial
                                 </a>
                             </li>
-                            <!-- Reemplazo de Solicitudes por La Carta -->
+                            <!-- Reemplazo de Solicitudes por La Carta (Panel Administrativo) -->
                             <li class="nav-item">
-                                <a class="nav-btn" href="<?= BASE_URL ?>/carta/index">
+                                <a class="nav-btn" href="<?= BASE_URL ?>/carta/admin">
                                     <i class="bi bi-book-half"></i> La Carta
                                 </a>
                             </li>

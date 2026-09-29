@@ -157,9 +157,21 @@ class CartaProducto
     public string $nombre = '';
     public ?string $descripcion = null;
     public float $precio = 0.0;
+    public int $stock = 10;
+    public int $cantidad_solicitada = 0;
     public ?string $imagen = null;
+    public string $dias_habilitados = 'Todos';
+    public ?string $fecha_habilitacion = null;
+    public string $hora_inicio = '00:00:00';
+    public string $hora_fin = '23:59:59';
     public bool $estado = true;
     public string $creado_en = '';
+
+    /** Devuelve las unidades disponibles actualmente. */
+    public function stockDisponible(): int
+    {
+        return max(0, $this->stock - $this->cantidad_solicitada);
+    }
 
     /** Convierte una fila SQL en una entidad CartaProducto. */
     public static function fromRow(array $row): self
@@ -170,9 +182,55 @@ class CartaProducto
         $p->nombre = (string) $row['nombre'];
         $p->descripcion = $row['descripcion'] ?? null;
         $p->precio = (float) $row['precio'];
+        $p->stock = (int) ($row['stock'] ?? 10);
+        $p->cantidad_solicitada = (int) ($row['cantidad_solicitada'] ?? 0);
         $p->imagen = $row['imagen'] ?? null;
+        $p->dias_habilitados = (string) ($row['dias_habilitados'] ?? 'Todos');
+        $p->fecha_habilitacion = $row['fecha_habilitacion'] ?? null;
+        $p->hora_inicio = (string) ($row['hora_inicio'] ?? '00:00:00');
+        $p->hora_fin = (string) ($row['hora_fin'] ?? '23:59:59');
         $p->estado = (bool) $row['estado'];
         $p->creado_en = (string) ($row['creado_en'] ?? '');
         return $p;
+    }
+}
+
+// Representa una reserva efectuada sobre La Carta
+class CartaReserva
+{
+    public int $id = 0;
+    public int $usuario_id = 0;
+    public ?int $entrada_id = null;
+    public ?int $plato_fuerte_id = null;
+    public ?int $bebida_id = null;
+    public ?int $postre_id = null;
+    public float $total = 0.0;
+    public string $fecha_reserva = '';
+    public string $fecha_consumo = '';
+    public string $donde_consume = 'En restaurante';
+    public string $estado = 'Activa';
+    public string $nit_facturacion = 'C/F';
+    public ?string $usuario_nombre = null;
+    public ?string $usuario_email = null;
+
+    /** Convierte una fila SQL en una entidad CartaReserva. */
+    public static function fromRow(array $row): self
+    {
+        $r = new self();
+        $r->id = (int) $row['id'];
+        $r->usuario_id = (int) $row['usuario_id'];
+        $r->entrada_id = isset($row['entrada_id']) && $row['entrada_id'] !== null ? (int) $row['entrada_id'] : null;
+        $r->plato_fuerte_id = isset($row['plato_fuerte_id']) && $row['plato_fuerte_id'] !== null ? (int) $row['plato_fuerte_id'] : null;
+        $r->bebida_id = isset($row['bebida_id']) && $row['bebida_id'] !== null ? (int) $row['bebida_id'] : null;
+        $r->postre_id = isset($row['postre_id']) && $row['postre_id'] !== null ? (int) $row['postre_id'] : null;
+        $r->total = (float) $row['total'];
+        $r->fecha_reserva = (string) $row['fecha_reserva'];
+        $r->fecha_consumo = (string) $row['fecha_consumo'];
+        $r->donde_consume = (string) ($row['donde_consume'] ?? 'En restaurante');
+        $r->estado = (string) ($row['estado'] ?? 'Activa');
+        $r->nit_facturacion = (string) ($row['nit_facturacion'] ?? 'C/F');
+        $r->usuario_nombre = $row['usuario_nombre'] ?? null;
+        $r->usuario_email = $row['usuario_email'] ?? null;
+        return $r;
     }
 }
