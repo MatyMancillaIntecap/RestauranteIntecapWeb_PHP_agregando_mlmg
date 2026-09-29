@@ -58,17 +58,24 @@ class AuthService
         return [true, '¡Inicio de sesión exitoso!', Usuario::fromRow($row)];
     }
 
-    // Crea una solicitud de restablecimiento de contraseña para un usuario existente
-    /** Crea una solicitud pendiente si el usuario existe y esta activo. */
-    public function crearSolicitudRestablecimiento(string $identificador): array
+    // Restablece automáticamente la contraseña del usuario a "87654321", aplica hash seguro y envía correo
+    /**
+     * Restablece automáticamente la contraseña a 87654321 y envía notificación por correo.
+     * Sin intervención del administrador. Maneja reversión segura si el correo no puede enviarse.
+     *
+     * @param string $identificador Correo electrónico del usuario.
+     * @return array{0: bool, 1: string} [éxito, mensaje de resultado]
+     */
+    public function restablecerPasswordAutomatico(string $identificador): array
     {
         $correo = strtolower(trim($identificador));
 
-        if ($correo === '' || !str_contains($correo, '@')) {
-            return [false, 'Ingresa el correo electrónico registrado para solicitar el restablecimiento.'];
+        if ($correo === '' || !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+            return [false, 'Ingresa un correo electrónico registrado válido para restablecer la contraseña.'];
         }
 
-        $stmt = $this->db->prepare('SELECT * FROM usuarios WHERE LOWER(email) = :email LIMIT 1');
+        // Buscar al usuario por correo
+        $stmt = $this->db->prepare('SELECT id, nombre, email, password, activo FROM usuarios WHERE LOWER(email) = :email LIMIT 1');
         $stmt->execute(['email' => $correo]);
         $usuario = $stmt->fetch();
 
@@ -80,23 +87,37 @@ class AuthService
             return [false, 'Tu cuenta se encuentra desactivada. Contacta al Administrador.'];
         }
 
-        $stmtPendiente = $this->db->prepare(
-            "SELECT COUNT(*) AS total FROM solicitudes_restablecimiento_password
-             WHERE usuario_id = :usuario_id AND estado = 'Pendiente'"
-        );
-        $stmtPendiente->execute(['usuario_id' => $usuario['id']]);
+        // Nueva contraseña requerida exactamente: 87654321 con hash seguro bcrypt
+        $nuevaPasswordPlano = '87654321';
+        $nuevoHash = password_hash($nuevaPasswordPlano, PASSWORD_BCRYPT);
+        $hashAnterior = (string) $usuario['password'];
+        $usuarioId = (int) $usuario['id'];
 
-        if ((int) $stmtPendiente->fetch()['total'] > 0) {
-            return [true, 'Ya existe una solicitud pendiente para este usuario. El administrador la revisará pronto.'];
+        // Actualizar la contraseña en la base de datos
+        $this->actualizarPassword($usuarioId, $nuevoHash);
+
+        // Envío automático de correo con la contraseña restablecida
+        require_once ROOT_PATH . '/services/CorreoService.php';
+        $correoService = new CorreoService();
+        [$correoEnviado, $correoMensaje] = $correoService->enviarRestablecimientoPassword(
+            ['nombre' => $usuario['nombre'], 'email' => $usuario['email']],
+            $nuevaPasswordPlano
+        );
+
+        // Si el correo no se pudo enviar, revertir contraseña al hash anterior para no dejar inconsistencia
+        if (!$correoEnviado) {
+            $this->actualizarPassword($usuarioId, $hashAnterior);
+            error_log("Error al enviar correo de restablecimiento automático a {$usuario['email']}: {$correoMensaje}");
+            return [false, 'No se pudo enviar el correo electrónico con su nueva contraseña. Su contraseña no fue modificada por seguridad. Intente nuevamente más tarde.'];
         }
 
-        $insert = $this->db->prepare(
-            "INSERT INTO solicitudes_restablecimiento_password (usuario_id, estado, fecha_solicitud)
-             VALUES (:usuario_id, 'Pendiente', NOW())"
-        );
-        $insert->execute(['usuario_id' => $usuario['id']]);
+        return [true, "Tu contraseña ha sido restablecida exitosamente a la temporal configurada. Hemos enviado los detalles a tu correo ({$usuario['email']})."];
+    }
 
-        return [true, 'Tu solicitud fue enviada correctamente. Debes esperar a que un administrador gestione el cambio.'];
+    // Compatibilidad: redirige llamadas anteriores al nuevo flujo automático sin administrador
+    public function crearSolicitudRestablecimiento(string $identificador): array
+    {
+        return $this->restablecerPasswordAutomatico($identificador);
     }
 
     // Inserta el registro de auditoría en la tabla historial_login

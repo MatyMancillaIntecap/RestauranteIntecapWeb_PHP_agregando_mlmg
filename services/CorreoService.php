@@ -7,6 +7,9 @@
  */
 declare(strict_types=1);
 
+// Cargar cliente SMTP nativo
+require_once ROOT_PATH . '/services/SmtpMailer.php';
+
 class CorreoService
 {
     private array $opciones;
@@ -24,7 +27,8 @@ class CorreoService
      * @param string $nuevaContrasenaPlano Contraseña en texto plano establecida temporalmente para el correo.
      * @return array{0: bool, 1: string} [éxito, mensaje de resultado]
      */
-    public function enviarCorreoNotificacionCambio(array $usuario, string $nuevaContrasenaPlano): array
+    // Envía notificación de actualización o restablecimiento de contraseña al usuario
+    public function enviarCorreoNotificacionCambio(array $usuario, string $nuevaContrasenaPlano, bool $esRestablecimiento = false): array
     {
         $nombre = !empty($usuario['nombre']) ? (string) $usuario['nombre'] : 'Usuario';
         $email = !empty($usuario['email']) ? trim((string) $usuario['email']) : '';
@@ -33,14 +37,15 @@ class CorreoService
             return [false, 'El usuario no tiene una dirección de correo electrónico válida registrada.'];
         }
 
-        $asunto = 'Contraseña actualizada';
-        $cuerpoHtml = $this->generarPlantillaNotificacionPassword($nombre, $nuevaContrasenaPlano);
+        // Asunto ajustado según sea restablecimiento automático o actualización manual
+        $asunto = $esRestablecimiento ? 'Contraseña restablecida' : 'Contraseña actualizada';
+        $cuerpoHtml = $this->generarPlantillaNotificacionPassword($nombre, $nuevaContrasenaPlano, $esRestablecimiento);
 
         return $this->enviarCorreoGenerico($email, $asunto, $cuerpoHtml);
     }
 
     /**
-     * Envía las credenciales temporales de un restablecimiento de contraseña.
+     * Envía las credenciales temporales de un restablecimiento de contraseña automático.
      *
      * @param array{nombre?: string, email?: string} $usuario
      * @param string $nuevaPasswordTemporal
@@ -48,13 +53,14 @@ class CorreoService
      */
     public function enviarRestablecimientoPassword(array $usuario, string $nuevaPasswordTemporal): array
     {
-        return $this->enviarCorreoNotificacionCambio($usuario, $nuevaPasswordTemporal);
+        // Pasa true para indicar que la contraseña fue restablecida
+        return $this->enviarCorreoNotificacionCambio($usuario, $nuevaPasswordTemporal, true);
     }
 
     /**
      * Construye la plantilla HTML del correo para la notificación de cambio de contraseña.
      */
-    private function generarPlantillaNotificacionPassword(string $nombre, string $nuevaContrasenaPlano): string
+    private function generarPlantillaNotificacionPassword(string $nombre, string $nuevaContrasenaPlano, bool $esRestablecimiento = false): string
     {
         $nombreSeguro = htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8');
         $passwordSegura = htmlspecialchars($nuevaContrasenaPlano, ENT_QUOTES, 'UTF-8');
@@ -66,12 +72,18 @@ class CorreoService
         $protocolo = $esHttps ? 'https://' : 'http://';
         $loginUrl = $protocolo . $host . $baseUrl . '/account/login';
 
+        // Adaptar mensaje según sea restablecimiento de contraseña solicitado por usuario o actualización por admin
+        $titulo = $esRestablecimiento ? 'Contraseña restablecida' : 'Contraseña actualizada';
+        $mensajePrincipal = $esRestablecimiento
+            ? 'Le informamos que su contraseña ha sido restablecida exitosamente.'
+            : 'Le informamos que su contraseña ha sido actualizada por el administrador.';
+
         return <<<HTML
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Contraseña actualizada</title>
+    <title>{$titulo}</title>
 </head>
 <body style="margin: 0; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; color: #333333; line-height: 1.6;">
     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
@@ -80,7 +92,7 @@ class CorreoService
         </div>
         <div style="padding: 30px 28px;">
             <p style="font-size: 16px; margin-top: 0;">Hola, <strong>{$nombreSeguro}</strong>:</p>
-            <p style="font-size: 15px;">Le informamos que su contraseña ha sido actualizada por el administrador.</p>
+            <p style="font-size: 15px;">{$mensajePrincipal}</p>
             <p style="font-size: 15px; color: #198754; font-weight: 600;">El cambio se realizó correctamente.</p>
             
             <div style="background-color: #f8fafc; border-left: 4px solid #0d6efd; padding: 16px 20px; margin: 25px 0; border-radius: 4px;">

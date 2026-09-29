@@ -149,13 +149,30 @@ class HistorialLogin
     public string $fecha_login = '';
 }
 
-/** Representa una solicitud de recuperación de contraseña. */
-class SolicitudRestablecimientoPassword
+// Representa un producto publicado en La Carta
+class CartaProducto
 {
     public int $id = 0;
-    public int $usuario_id = 0;
-    public ?int $usuario_admin_id = null;
-    public string $estado = 'Pendiente';
-    public string $fecha_solicitud = '';
-    public ?string $fecha_atencion = null;
+    public string $categoria = '';
+    public string $nombre = '';
+    public ?string $descripcion = null;
+    public float $precio = 0.0;
+    public ?string $imagen = null;
+    public bool $estado = true;
+    public string $creado_en = '';
+
+    /** Convierte una fila SQL en una entidad CartaProducto. */
+    public static function fromRow(array $row): self
+    {
+        $p = new self();
+        $p->id = (int) $row['id'];
+        $p->categoria = (string) $row['categoria'];
+        $p->nombre = (string) $row['nombre'];
+        $p->descripcion = $row['descripcion'] ?? null;
+        $p->precio = (float) $row['precio'];
+        $p->imagen = $row['imagen'] ?? null;
+        $p->estado = (bool) $row['estado'];
+        $p->creado_en = (string) ($row['creado_en'] ?? '');
+        return $p;
+    }
 }

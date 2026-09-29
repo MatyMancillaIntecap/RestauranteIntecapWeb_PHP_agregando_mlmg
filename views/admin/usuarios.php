@@ -5,7 +5,6 @@
  * @var array $usuarios
  * @var string $email_busqueda
  * @var array $roles
- * @var int $solicitudes_pendientes
  */
 ?>
 <div class="container-fluid mt-3 mb-5">

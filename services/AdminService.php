@@ -235,15 +235,8 @@ class AdminService
                 ]);
             }
 
-            $adminSolicitudes = $this->db->prepare(
-                'UPDATE solicitudes_restablecimiento_password
-                 SET usuario_admin_id = NULL
-                 WHERE usuario_admin_id = :usuario_admin_id'
-            );
-            $adminSolicitudes->execute(['usuario_admin_id' => $id]);
-
+            // Limpieza de relaciones del usuario (historial y reservas)
             $tablas = [
-                'solicitudes_restablecimiento_password' => 'usuario_id',
                 'historial_login' => 'usuario_id',
                 'reservas' => 'usuario_id',
             ];
@@ -271,91 +264,9 @@ class AdminService
         return $this->db->query('SELECT * FROM roles ORDER BY id')->fetchAll();
     }
 
-    /** Cuenta solicitudes que aun esperan atencion. */
-    public function obtenerCantidadSolicitudesRestablecimientoPendientes(): int
-    {
-        $row = $this->db->query("SELECT COUNT(*) AS total FROM solicitudes_restablecimiento_password WHERE estado = 'Pendiente'")->fetch();
-        return (int) $row['total'];
-    }
+    // Nota: Los métodos obtenerCantidadSolicitudesRestablecimientoPendientes, obtenerSolicitudesRestablecimiento
+    // y atenderSolicitudRestablecimiento fueron eliminados ya que las contraseñas ahora se restablecen de forma 100% automática.
 
-    /** Devuelve solicitudes con datos del usuario y administrador que atendio. */
-    public function obtenerSolicitudesRestablecimiento(): array
-    {
-        $stmt = $this->db->query(
-            "SELECT s.id, s.usuario_id, u.nombre AS nombre_usuario, u.email AS email_usuario,
-                    s.fecha_solicitud, s.fecha_atencion, s.usuario_admin_id, a.nombre AS nombre_admin_atendio, s.estado
-             FROM solicitudes_restablecimiento_password s
-             INNER JOIN usuarios u ON u.id = s.usuario_id
-             LEFT JOIN usuarios a ON a.id = s.usuario_admin_id
-             ORDER BY s.fecha_solicitud DESC"
-        );
-
-        return $stmt->fetchAll();
-    }
-
-    /** Restablece una clave dentro de una transaccion y marca la solicitud. */
-    public function atenderSolicitudRestablecimiento(int $solicitudId, string $nuevaPassword, int $adminUsuarioId): array
-    {
-        if ($solicitudId <= 0) {
-            return [false, 'ERR:Debe seleccionar una solicitud válida.'];
-        }
-
-        if ($adminUsuarioId <= 0) {
-            return [false, 'ERR:No se pudo identificar el administrador que atiende la solicitud.'];
-        }
-
-        $stmt = $this->db->prepare(
-            'SELECT s.*, u.id AS usuario_id_real, u.nombre AS usuario_nombre, u.email AS usuario_email
-             FROM solicitudes_restablecimiento_password s
-             INNER JOIN usuarios u ON u.id = s.usuario_id
-             WHERE s.id = :id'
-        );
-        $stmt->execute(['id' => $solicitudId]);
-        $solicitud = $stmt->fetch();
-
-        if (!$solicitud) {
-            return [false, 'ERR:No se encontró la solicitud indicada.'];
-        }
-
-        if ($solicitud['estado'] !== 'Pendiente') {
-            return [false, 'ERR:La solicitud ya fue atendida previamente.'];
-        }
-
-        // Si el administrador introdujo una contraseña personalizada se utiliza esa; de lo contrario, se usa 87654321
-        $contrasenaRestablecida = trim($nuevaPassword) !== '' ? trim($nuevaPassword) : '87654321';
-        $hash = password_hash($contrasenaRestablecida, PASSWORD_BCRYPT);
-
-        $this->db->beginTransaction();
-        try {
-            $updUsuario = $this->db->prepare('UPDATE usuarios SET password = :password WHERE id = :id');
-            $updUsuario->execute(['password' => $hash, 'id' => $solicitud['usuario_id']]);
-
-            $updSolicitud = $this->db->prepare(
-                "UPDATE solicitudes_restablecimiento_password
-                 SET estado = 'Realizado', fecha_atencion = NOW(), usuario_admin_id = :admin_id
-                 WHERE id = :id"
-            );
-            $updSolicitud->execute(['admin_id' => $adminUsuarioId, 'id' => $solicitudId]);
-
-            $this->db->commit();
-        } catch (Throwable $e) {
-            $this->db->rollBack();
-            return [false, 'ERR:No se pudo guardar la nueva contraseña.'];
-        }
-
-        // Notificar por correo tras la actualización exitosa en la base de datos
-        [$correoEnviado, $correoMensaje] = $this->correoService->enviarCorreoNotificacionCambio(
-            ['nombre' => $solicitud['usuario_nombre'], 'email' => $solicitud['usuario_email']],
-            $contrasenaRestablecida
-        );
-
-        if (!$correoEnviado) {
-            error_log("Error al enviar notificación tras restablecimiento a {$solicitud['usuario_email']}: {$correoMensaje}");
-            return [true, "WARN:Contraseña restablecida a {$contrasenaRestablecida}, pero ocurrió un problema al enviar la notificación por correo: {$correoMensaje}"];
-        }
-
-        return [true, "OK:Contraseña restablecida a {$contrasenaRestablecida}. Se envió la notificación por correo a {$solicitud['usuario_email']}."];
-    }
 
     // Detalle completo de un usuario: datos + historial de reservas + totales acumulados
     /** Combina datos de usuario, reservas y totales acumulados para su ficha. */

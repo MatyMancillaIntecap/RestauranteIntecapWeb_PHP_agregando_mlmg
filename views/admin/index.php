@@ -10,7 +10,6 @@
  * @var int $reservas_hoy
  * @var int $usuarios_con_reserva
  * @var int $total_usuarios
- * @var int $solicitudes_pendientes
  * @var string $fecha_inicio
  * @var string $fecha_fin
  */
@@ -90,7 +89,7 @@
 
     </div>
 
-    <!-- TARJETAS USUARIOS + SOLICITUDES -->
+    <!-- TARJETAS USUARIOS + LA CARTA -->
     <div class="row mb-4">
         <div class="col-md-6 mb-3 mb-md-0">
             <div class="card border-0 shadow-sm rounded-3 p-3 bg-dark text-white h-100">
@@ -105,15 +104,16 @@
                 </div>
             </div>
         </div>
+        <!-- Reemplazo de Solicitudes por La Carta -->
         <div class="col-md-6">
-            <a href="<?= BASE_URL ?>/admin/solicitudes-restablecimiento"
-               class="card border-0 shadow-sm rounded-3 p-3 bg-warning text-dark text-decoration-none h-100 d-block">
+            <a href="<?= BASE_URL ?>/carta/index"
+               class="card border-0 shadow-sm rounded-3 p-3 bg-primary text-white text-decoration-none h-100 d-block">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <span class="small fw-bold text-uppercase">🔐 Solicitudes de contraseña</span>
-                        <h5 class="fw-bold mt-1 mb-0"><?= (int)$solicitudes_pendientes ?> pendientes</h5>
+                        <span class="small fw-bold text-uppercase text-light">📖 La Carta</span>
+                        <h5 class="fw-bold mt-1 mb-0">Gestión de Productos por Categoría</h5>
                     </div>
-                    <div class="fs-2">📨</div>
+                    <div class="fs-2">🍽️</div>
                 </div>
             </a>
         </div>

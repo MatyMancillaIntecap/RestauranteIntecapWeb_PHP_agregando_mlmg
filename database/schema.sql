@@ -75,17 +75,20 @@ CREATE TABLE IF NOT EXISTS historial_login (
     CONSTRAINT fk_historial_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 ) ENGINE=InnoDB;
 
--- Tabla solicitudes_restablecimiento_password
-CREATE TABLE IF NOT EXISTS solicitudes_restablecimiento_password (
+-- Tabla carta_productos (La Carta: Entrada, Plato fuerte, Bebida, Postre)
+CREATE TABLE IF NOT EXISTS carta_productos (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    usuario_id INT NOT NULL,
-    usuario_admin_id INT NULL,
-    estado VARCHAR(20) NOT NULL DEFAULT 'Pendiente',
-    fecha_solicitud DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    fecha_atencion DATETIME NULL,
-    CONSTRAINT fk_solicitud_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-    CONSTRAINT fk_solicitud_admin FOREIGN KEY (usuario_admin_id) REFERENCES usuarios(id)
+    categoria VARCHAR(50) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT NULL,
+    precio DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    imagen VARCHAR(255) NULL,
+    estado TINYINT(1) NOT NULL DEFAULT 1,
+    creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
+
+-- Nota: El flujo antiguo de solicitudes manuales a través de la tabla solicitudes_restablecimiento_password
+-- fue eliminado en favor del restablecimiento automático directo al correo con clave '87654321'.
 
 -- Datos base
 INSERT INTO roles (nombre, descripcion, max_almuerzos) VALUES

@@ -11,7 +11,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitar restablecimiento - Restaurante INTECAP</title>
+    <!-- Título y encabezado ajustados para el restablecimiento automático -->
+    <title>Restablecer contraseña - Restaurante INTECAP</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <style>
         body {
@@ -31,8 +32,8 @@
     <div class="card card-custom border-0 p-4">
         <div class="text-center mb-3">
             <img src="<?= BASE_URL ?>/images/logo_intecap/Logo-Azul-Intecap.png" alt="Logo INTECAP" style="max-height:60px;object-fit:contain;" class="mb-2">
-            <h3 class="fw-bold text-dark mb-1" style="font-size:1.4rem;">Solicitar restablecimiento</h3>
-            <p class="text-muted small mb-0">Ingrese su correo electrónico registrado para que un administrador revise la solicitud.</p>
+            <h3 class="fw-bold text-dark mb-1" style="font-size:1.4rem;">Restablecer contraseña</h3>
+            <p class="text-muted small mb-0">Ingrese su correo electrónico registrado para restablecer automáticamente su contraseña.</p>
         </div>
 
         <?php if (!empty($mensaje)): ?>
@@ -51,7 +52,7 @@
                 </div>
             </div>
             <div class="d-grid mb-3">
-                <button type="submit" class="btn btn-primary fw-bold py-2" style="background-color:#1e68f7;border:none;">ENVIAR SOLICITUD</button>
+                <button type="submit" class="btn btn-primary fw-bold py-2" style="background-color:#1e68f7;border:none;">RESTABLECER CONTRASEÑA</button>
             </div>
             <div class="text-center mt-2">
                 <a href="<?= BASE_URL ?>/account/login" class="text-decoration-none">Volver al login</a>

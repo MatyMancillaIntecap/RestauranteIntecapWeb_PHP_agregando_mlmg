@@ -42,7 +42,6 @@ class AdminController extends Controller
             'reservas_hoy' => $this->empleadoService->obtenerTotalReservasHoy($inicio, $fin),
             'usuarios_con_reserva' => $this->empleadoService->obtenerUsuariosConReservasHoy($inicio, $fin),
             'total_usuarios' => $this->empleadoService->obtenerTotalUsuariosRegistrados(),
-            'solicitudes_pendientes' => $this->adminService->obtenerCantidadSolicitudesRestablecimientoPendientes(),
             'fecha_inicio' => $inicio,
             'fecha_fin' => $fin,
         ];
@@ -67,7 +66,6 @@ class AdminController extends Controller
             'usuarios' => $usuarios,
             'email_busqueda' => $correo,
             'roles' => $this->adminService->obtenerRoles(),
-            'solicitudes_pendientes' => $this->adminService->obtenerCantidadSolicitudesRestablecimientoPendientes(),
         ]);
     }
 
@@ -186,46 +184,8 @@ class AdminController extends Controller
         $this->json(['ok' => true, 'mensaje' => $mensaje]);
     }
 
-    // GET /admin/solicitudes-restablecimiento
-    /** Muestra solicitudes pendientes y ya atendidas. */
-    public function solicitudesRestablecimiento(): void
-    {
-        $this->render('admin/solicitudes_restablecimiento', [
-            'solicitudes' => $this->adminService->obtenerSolicitudesRestablecimiento(),
-            'solicitudes_pendientes' => $this->adminService->obtenerCantidadSolicitudesRestablecimientoPendientes(),
-        ]);
-    }
-
-    // POST /admin/atender-solicitud-restablecimiento
-    /** Atiende una solicitud y asigna la contrasena definida por el administrador o la sugerida. */
-    public function atenderSolicitudRestablecimiento(): void
-    {
-        $solicitudId = (int) $this->input('solicitud_id', 0);
-        $nuevaPassword = trim((string) $this->input('nueva_password', '87654321'));
-
-        if ($nuevaPassword === '') {
-            $nuevaPassword = '87654321';
-        }
-
-        if (strlen($nuevaPassword) < 8) {
-            $this->flash('error', 'La nueva contraseña debe tener al menos 8 caracteres.');
-            $this->redirect('admin/solicitudes-restablecimiento');
-            return;
-        }
-
-        [$exito, $mensaje] = $this->adminService->atenderSolicitudRestablecimiento($solicitudId, $nuevaPassword, Auth::id());
-        $mensajeLimpio = $this->limpiarPrefijoMensaje($mensaje);
-
-        if (!$exito) {
-            $this->flash('error', $mensajeLimpio);
-        } elseif (str_starts_with($mensaje, 'WARN:')) {
-            $this->flash('advertencia', $mensajeLimpio);
-        } else {
-            $this->flash('exito', $mensajeLimpio);
-        }
-
-        $this->redirect('admin/solicitudes-restablecimiento');
-    }
+    // Nota: Las acciones solicitudesRestablecimiento y atenderSolicitudRestablecimiento fueron eliminadas
+    // debido a que el flujo de restablecimiento ahora es 100% automático y no requiere intervención del administrador.
 
     /** Elimina prefijos internos de resultado antes de mostrar un mensaje. */
     private function limpiarPrefijoMensaje(string $mensaje): string

@@ -93,7 +93,7 @@ class AccountController extends Controller
     }
 
     // GET/POST /account/recuperar-password
-    /** Crea una solicitud de restablecimiento para un correo registrado. */
+    // Restablece la contraseña de forma automática y envía correo al usuario registrado
     public function recuperarPassword(): void
     {
         $mensaje = null;
@@ -101,7 +101,8 @@ class AccountController extends Controller
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $identificador = (string) $this->input('identificador', '');
-            [$exito, $texto] = $this->authService->crearSolicitudRestablecimiento($identificador);
+            // Se ejecuta el restablecimiento automático a "87654321" y envío de correo
+            [$exito, $texto] = $this->authService->restablecerPasswordAutomatico($identificador);
 
             if (!$exito) {
                 $error = $texto;

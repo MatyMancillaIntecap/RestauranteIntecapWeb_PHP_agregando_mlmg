@@ -55,20 +55,6 @@
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
 
-<?php
-// El badge solo consulta solicitudes cuando el usuario es administrador.
-$_navSolicitudesPendientes = 0;
-if (Auth::check() && Auth::role() === 'Administrador') {
-    try {
-        $db = Database::getConnection();
-        $row = $db->query("SELECT COUNT(*) AS total FROM solicitudes_restablecimiento_password WHERE estado = 'Pendiente'")->fetch();
-        $_navSolicitudesPendientes = (int)($row['total'] ?? 0);
-    } catch (Throwable $e) {
-        $_navSolicitudesPendientes = 0;
-    }
-}
-?>
-
 <header>
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom shadow">
         <div class="container-fluid px-3">
@@ -112,14 +98,10 @@ if (Auth::check() && Auth::role() === 'Administrador') {
                                     <i class="bi bi-journal-text"></i> Mi Historial
                                 </a>
                             </li>
+                            <!-- Reemplazo de Solicitudes por La Carta -->
                             <li class="nav-item">
-                                <a class="nav-btn" href="<?= BASE_URL ?>/admin/solicitudes-restablecimiento">
-                                    <i class="bi bi-shield-lock-fill"></i> Solicitudes
-                                    <?php if ($_navSolicitudesPendientes > 0): ?>
-                                        <span class="navbar-badge">
-                                            <?= min($_navSolicitudesPendientes, 99) ?>
-                                        </span>
-                                    <?php endif; ?>
+                                <a class="nav-btn" href="<?= BASE_URL ?>/carta/index">
+                                    <i class="bi bi-book-half"></i> La Carta
                                 </a>
                             </li>
 
@@ -139,6 +121,12 @@ if (Auth::check() && Auth::role() === 'Administrador') {
                                     <i class="bi bi-journal-text"></i> Mis Reservas
                                 </a>
                             </li>
+                            <!-- Nueva pestaña La Carta para Cocina -->
+                            <li class="nav-item">
+                                <a class="nav-btn" href="<?= BASE_URL ?>/carta/index">
+                                    <i class="bi bi-book-half"></i> La Carta
+                                </a>
+                            </li>
 
                         <?php else: ?>
                             <li class="nav-item">
@@ -149,6 +137,12 @@ if (Auth::check() && Auth::role() === 'Administrador') {
                             <li class="nav-item">
                                 <a class="nav-btn" href="<?= BASE_URL ?>/empleado/historial">
                                     <i class="bi bi-journal-text"></i> Mi Historial
+                                </a>
+                            </li>
+                            <!-- Nueva pestaña La Carta para Empleados/Usuarios -->
+                            <li class="nav-item">
+                                <a class="nav-btn" href="<?= BASE_URL ?>/carta/index">
+                                    <i class="bi bi-book-half"></i> La Carta
                                 </a>
                             </li>
 
