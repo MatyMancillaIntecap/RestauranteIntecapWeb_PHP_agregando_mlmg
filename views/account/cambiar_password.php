@@ -5,17 +5,18 @@
  * @var string|null $error
  */
 ?>
-<div class="row justify-content-center">
-    <div class="col-lg-5 col-md-7 col-12">
-        <!-- // Tarjeta enmarcada con límites claros y cabecera institucional -->
-        <div class="card shadow mt-4 rounded-3 border-2" style="border: 2.5px solid #1e3a8a !important;">
-            <div class="card-header text-white py-3 text-center"
-                 style="background: linear-gradient(135deg, #0a2540 0%, #123d6b 50%, #1e40af 100%) !important;">
-                <h4 class="mb-0 fw-bold d-flex align-items-center justify-content-center gap-2">
-                    <span>🔑</span> Cambiar Mi Contraseña
-                </h4>
-            </div>
-            <div class="card-body p-4">
+<div class="container-fluid px-3 px-sm-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7 col-12">
+            <!-- // Tarjeta enmarcada con límites claros y cabecera institucional -->
+            <div class="card shadow mt-4 mb-5 rounded-3 border-2" style="border: 2.5px solid #1e3a8a !important;">
+                <div class="card-header text-white py-3 text-center"
+                     style="background: linear-gradient(135deg, #0a2540 0%, #123d6b 50%, #1e40af 100%) !important;">
+                    <h4 class="mb-0 fw-bold d-flex align-items-center justify-content-center gap-2">
+                        <span>🔑</span> Cambiar Mi Contraseña
+                    </h4>
+                </div>
+                <div class="card-body p-3 p-sm-4">
 
                 <?php if (!empty($error)): ?>
                     <div class="alert alert-danger fw-bold mb-3"><?= htmlspecialchars($error) ?></div>
@@ -42,4 +43,5 @@
             </div>
         </div>
     </div>
+</div>
 </div>

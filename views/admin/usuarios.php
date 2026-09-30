@@ -52,8 +52,8 @@
                     </div>
                 </div>
                 <div class="col-md-6 col-12 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary fw-bold shadow-sm">Buscar</button>
-                    <a href="<?= BASE_URL ?>/admin/usuarios" class="btn btn-outline-secondary fw-bold">Limpiar Filtro</a>
+                    <button type="submit" class="btn btn-primary fw-bold shadow-sm flex-grow-1 flex-md-grow-0">Buscar</button>
+                    <a href="<?= BASE_URL ?>/admin/usuarios" class="btn btn-outline-secondary fw-bold flex-grow-1 flex-md-grow-0">Limpiar Filtro</a>
                 </div>
             </form>
         </div>

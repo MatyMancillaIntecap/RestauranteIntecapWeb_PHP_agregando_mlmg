@@ -24,17 +24,19 @@
                 <div class="col-md-7 col-12 mt-3 mt-md-0">
                     <form method="get" action="<?= BASE_URL ?>/cocina/index"
                           class="d-flex align-items-center justify-content-md-end gap-2 flex-wrap">
-                        <label class="fw-bold text-nowrap text-white">Fecha Consulta:</label>
-                        <input type="date" name="fecha" class="form-control form-control-sm w-auto"
-                               value="<?= htmlspecialchars($fecha_consulta) ?>"
-                               onchange="this.form.submit()">
-                        <div class="d-flex gap-2">
+                        <div class="d-flex align-items-center gap-2 flex-grow-1 flex-md-grow-0">
+                            <label class="fw-bold text-nowrap text-white">Fecha:</label>
+                            <input type="date" name="fecha" class="form-control form-control-sm flex-grow-1"
+                                   value="<?= htmlspecialchars($fecha_consulta) ?>"
+                                   onchange="this.form.submit()">
+                        </div>
+                        <div class="d-flex gap-2 flex-grow-1 flex-md-grow-0">
                             <a href="<?= BASE_URL ?>/cocina/descargar-excel?fecha=<?= urlencode($fecha_consulta) ?>"
-                               class="btn btn-success fw-bold text-nowrap shadow-sm">
+                               class="btn btn-success fw-bold text-nowrap shadow-sm flex-fill text-center">
                                 📊 Excel
                             </a>
                             <a href="<?= BASE_URL ?>/cocina/descargar-pdf?fecha=<?= urlencode($fecha_consulta) ?>"
-                               class="btn btn-danger fw-bold text-nowrap shadow-sm">
+                               class="btn btn-danger fw-bold text-nowrap shadow-sm flex-fill text-center">
                                 📄 PDF
                             </a>
                         </div>

@@ -9,7 +9,7 @@
  * @var string $nit_usuario
  */
 ?>
-<div class="container mt-3 mb-5">
+<div class="container-fluid container-lg mt-3 mb-5 px-3 px-sm-4">
 
     <!-- // BARRA SUPERIOR CON COLORES FUERTES INTECAP -->
     <div class="card shadow mb-4 rounded-3 text-white"
@@ -83,23 +83,23 @@
                                 </div>
 
                                 <div class="border-top pt-3">
-                                    <!-- Selector de cantidad con botones +/- -->
+                                    <!-- Selector de cantidad con botones +/- táctiles -->
                                     <div class="mb-2">
                                         <label class="form-label small fw-bold">Cantidad:</label>
-                                        <div class="input-group input-group-sm">
-                                            <button class="btn btn-outline-secondary" type="button"
+                                        <div class="input-group">
+                                            <button class="btn btn-outline-secondary px-3 py-2 fw-bold" type="button"
                                                     onclick="cambiarCantidad(<?= (int)$m['id'] ?>, -1)">−</button>
                                             <input type="number" id="cantidad_<?= (int)$m['id'] ?>"
-                                                   class="form-control text-center fw-bold"
+                                                   class="form-control text-center fw-bold fs-6"
                                                    value="1" min="1" max="<?= (int)$m['stock'] ?>" readonly>
-                                            <button class="btn btn-outline-secondary" type="button"
+                                            <button class="btn btn-outline-secondary px-3 py-2 fw-bold" type="button"
                                                     onclick="cambiarCantidad(<?= (int)$m['id'] ?>, 1, <?= (int)$m['stock'] ?>)">+</button>
                                         </div>
                                     </div>
 
                                     <div class="mb-2">
                                         <label class="form-label small fw-bold">Forma de Pago:</label>
-                                        <select id="pago_<?= (int)$m['id'] ?>" class="form-select form-select-sm">
+                                        <select id="pago_<?= (int)$m['id'] ?>" class="form-select">
                                             <option value="1">💵 Efectivo</option>
                                             <option value="2">💳 Carnet</option>
                                         </select>
@@ -107,13 +107,13 @@
 
                                     <div class="mb-2">
                                         <label class="form-label small fw-bold">Consumo:</label>
-                                        <select id="lugar_<?= (int)$m['id'] ?>" class="form-select form-select-sm">
+                                        <select id="lugar_<?= (int)$m['id'] ?>" class="form-select">
                                             <option value="En restaurante">🍽️ En restaurante</option>
                                             <option value="Para llevar">🛍️ Para llevar</option>
                                         </select>
                                     </div>
 
-                                    <button class="btn btn-primary w-100 fw-bold mt-2"
+                                    <button class="btn btn-primary w-100 fw-bold py-2 mt-2"
                                             onclick="agregarAlCarrito(<?= (int)$m['id'] ?>, '<?= addslashes(htmlspecialchars($m['nombre_plato'])) ?>', <?= (float)$m['precio'] ?>, <?= (int)$m['stock'] ?>)">
                                         🛒 Seleccionar Platillo
                                     </button>
@@ -165,6 +165,19 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- BARRA FLOTANTE MÓVIL DEL CARRITO (Sólo visible en móviles cuando hay platillos seleccionados) -->
+<div id="barraMovilEmpleado" class="fixed-bottom bg-white border-top shadow-lg p-2 d-lg-none d-none" style="z-index: 1040;">
+    <div class="container-fluid d-flex justify-content-between align-items-center gap-2">
+        <div>
+            <div class="small text-muted"><span id="cantMovil">0</span> platillo(s) en orden</div>
+            <div class="fw-bold text-success fs-5" id="totalMovil">Q 0.00</div>
+        </div>
+        <button class="btn btn-success fw-bold px-3 py-2 shadow-sm" onclick="irAlCarritoMovil()">
+            🛍️ Ver Mi Solicitud
+        </button>
     </div>
 </div>
 
@@ -261,11 +274,14 @@ function agregarAlCarrito(id, nombre, precio, stockMaximo) {
 
 function renderizarCarrito() {
     const contenedor = document.getElementById('listaCarrito');
+    const barraMovil = document.getElementById('barraMovilEmpleado');
+
     if (carrito.length === 0) {
         contenedor.innerHTML = '<p class="text-muted text-center py-3">No has seleccionado platillos aún.</p>';
         document.getElementById('totalPagar').textContent  = 'Q 0.00';
         document.getElementById('countPlatillos').textContent = '0';
         document.getElementById('btnConfirmar').disabled  = true;
+        if (barraMovil) barraMovil.classList.add('d-none');
         return;
     }
 
@@ -292,6 +308,21 @@ function renderizarCarrito() {
     document.getElementById('totalPagar').textContent     = 'Q ' + total.toFixed(2);
     document.getElementById('countPlatillos').textContent = cantTotal;
     document.getElementById('btnConfirmar').disabled      = false;
+
+    if (barraMovil) {
+        barraMovil.classList.remove('d-none');
+        const cantSpan = document.getElementById('cantMovil');
+        const totalSpan = document.getElementById('totalMovil');
+        if (cantSpan) cantSpan.textContent = cantTotal;
+        if (totalSpan) totalSpan.textContent = 'Q ' + total.toFixed(2);
+    }
+}
+
+function irAlCarritoMovil() {
+    const el = document.getElementById('listaCarrito');
+    if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 }
 
 function eliminarDelCarrito(idx) {

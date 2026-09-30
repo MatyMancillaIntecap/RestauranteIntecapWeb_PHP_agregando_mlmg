@@ -59,9 +59,9 @@
 <header>
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom shadow">
         <div class="container-fluid px-3">
-            <a class="navbar-brand d-flex align-items-center fw-bold fs-5 me-3"
+            <a class="navbar-brand d-flex align-items-center fw-bold me-2 me-md-3"
                href="<?= BASE_URL ?>/account/login">
-                <span class="fs-4 me-2">🍳</span><span>Restaurante Intecap</span>
+                <span class="fs-4 me-2">🍳</span><span class="brand-text">Restaurante Intecap</span>
             </a>
             <button class="navbar-toggler" type="button"
                     data-bs-toggle="collapse" data-bs-target="#navbarContent"
@@ -152,7 +152,7 @@
                 </ul>
 
                 <?php if (Auth::check()): ?>
-                    <div class="d-flex align-items-center text-white gap-2 flex-wrap mt-2 mt-lg-0">
+                    <div class="navbar-user-actions d-flex align-items-center text-white gap-2 flex-wrap mt-2 mt-lg-0">
                         <div class="user-badge d-flex align-items-center me-1 flex-wrap gap-1">
                             <i class="bi bi-person-circle fs-5 me-1 text-warning"></i>
                             <span class="fw-bold"><?= htmlspecialchars(Auth::user()['nombre']) ?></span>

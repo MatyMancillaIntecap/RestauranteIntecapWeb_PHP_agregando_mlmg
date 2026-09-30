@@ -73,15 +73,15 @@ $estilosCategorias = [
                 </div>
                 <div class="col-md-6 col-12 text-md-end mt-3 mt-md-0 d-flex gap-2 justify-content-md-end flex-wrap">
                     <!-- Opción Vista Cliente -->
-                    <a href="<?= BASE_URL ?>/carta/index" class="btn btn-light text-primary fw-bold shadow-sm">
+                    <a href="<?= BASE_URL ?>/carta/index" class="btn btn-light text-primary fw-bold shadow-sm flex-fill flex-md-grow-0 text-center">
                         👁️ Ver Vista Cliente
                     </a>
                     <!-- El administrador también puede realizar una reserva desde aquí -->
-                    <button type="button" class="btn btn-warning text-dark fw-bold shadow-sm" onclick="abrirModalReservaAdmin()">
+                    <button type="button" class="btn btn-warning text-dark fw-bold shadow-sm flex-fill flex-md-grow-0 text-center" onclick="abrirModalReservaAdmin()">
                         🍽️ Realizar Reserva
                     </button>
                     <!-- Botón para nuevo producto -->
-                    <button type="button" class="btn btn-success fw-bold shadow-sm" onclick="abrirModalNuevoProducto()">
+                    <button type="button" class="btn btn-success fw-bold shadow-sm flex-fill flex-md-grow-0 text-center" onclick="abrirModalNuevoProducto()">
                         ➕ Nuevo Producto
                     </button>
                 </div>
@@ -139,9 +139,9 @@ $estilosCategorias = [
 
                         <!-- // TARJETA DE CATEGORÍA CON COLOR LLAMATIVO Y ENCABEZADO VIBRANTE -->
                         <div class="card mb-4 rounded-3 shadow" style="border: 2.5px solid <?= $estilo['border'] ?> !important; background: <?= $estilo['bg_card'] ?>;">
-                            <div class="card-header text-white py-3 d-flex justify-content-between align-items-center shadow-sm"
+                            <div class="card-header text-white py-3 d-flex justify-content-between align-items-center shadow-sm flex-wrap gap-2"
                                  style="background: <?= $estilo['bg_gradient'] ?> !important;">
-                                <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
                                     <span class="fs-4"><?= $icono ?></span>
                                     <h5 class="mb-0 fw-bold text-white text-uppercase" style="letter-spacing: 0.5px;"><?= htmlspecialchars($cat) ?></h5>
                                     <span class="badge bg-white text-dark ms-2 fw-bold shadow-sm"><?= count($productos) ?> producto<?= count($productos) !== 1 ? 's' : '' ?></span>
@@ -290,22 +290,24 @@ $estilosCategorias = [
                             <form method="get" action="<?= BASE_URL ?>/carta/admin"
                                   class="d-flex align-items-center justify-content-md-end gap-2 flex-wrap">
                                 <input type="hidden" name="tab" value="consolidado">
-                                <label class="fw-bold text-nowrap small text-white">Fecha Consulta:</label>
-                                <input type="date" name="fecha" class="form-control form-control-sm w-auto"
-                                       value="<?= htmlspecialchars($fechaFiltro) ?>"
-                                       onchange="this.form.submit()">
+                                <div class="d-flex align-items-center gap-2 flex-grow-1 flex-md-grow-0">
+                                    <label class="fw-bold text-nowrap small text-white">Fecha:</label>
+                                    <input type="date" name="fecha" class="form-control form-control-sm flex-grow-1"
+                                           value="<?= htmlspecialchars($fechaFiltro) ?>"
+                                           onchange="this.form.submit()">
+                                </div>
                                 <?php if ($fechaFiltro !== ''): ?>
-                                    <a href="<?= BASE_URL ?>/carta/admin?tab=consolidado&fecha=" class="btn btn-sm btn-light text-dark fw-bold text-nowrap" title="Ver acumulado de todas las fechas">
+                                    <a href="<?= BASE_URL ?>/carta/admin?tab=consolidado&fecha=" class="btn btn-sm btn-light text-dark fw-bold text-nowrap flex-grow-1 flex-md-grow-0 text-center" title="Ver acumulado de todas las fechas">
                                         Histórico General
                                     </a>
                                 <?php endif; ?>
-                                <div class="d-flex gap-2">
+                                <div class="d-flex gap-2 flex-grow-1 flex-md-grow-0">
                                     <a href="<?= BASE_URL ?>/carta/descargar-excel?fecha=<?= urlencode($fechaFiltro) ?>"
-                                       class="btn btn-sm btn-success fw-bold text-nowrap shadow-sm">
+                                       class="btn btn-sm btn-success fw-bold text-nowrap shadow-sm flex-fill text-center">
                                         📊 Excel
                                     </a>
                                     <a href="<?= BASE_URL ?>/carta/descargar-pdf?fecha=<?= urlencode($fechaFiltro) ?>"
-                                       class="btn btn-sm btn-danger fw-bold text-nowrap shadow-sm">
+                                       class="btn btn-sm btn-danger fw-bold text-nowrap shadow-sm flex-fill text-center">
                                         📄 PDF
                                     </a>
                                 </div>
@@ -323,7 +325,7 @@ $estilosCategorias = [
                         <span class="fs-4">📊</span>
                         <h5 class="mb-0 fw-bold">Recuento Consolidado por Producto</h5>
                     </div>
-                    <div class="d-flex gap-3 small fw-bold">
+                    <div class="d-flex gap-2 flex-wrap small fw-bold">
                         <span class="badge bg-white text-primary fs-6 shadow-sm">
                             Total Reservados: <?= (int) ($consolidado['total_platillos_reservados'] ?? 0) ?> unidades
                         </span>

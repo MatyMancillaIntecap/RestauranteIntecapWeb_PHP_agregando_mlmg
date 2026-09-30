@@ -5,11 +5,11 @@
  * @var array $detalle Contiene info_usuario, historial_reservas y totales acumulados.
  */
 ?>
-<div class="container mt-3 mb-5">
+<div class="container-fluid mt-3 mb-5">
 
     <!-- Encabezado con info completa del usuario -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="text-primary fw-bold">👤 Detalle de Usuario</h3>
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h3 class="text-primary fw-bold mb-0">👤 Detalle de Usuario</h3>
         <a href="<?= BASE_URL ?>/admin/usuarios" class="btn btn-secondary">← Volver a Usuarios</a>
     </div>
 
@@ -20,11 +20,11 @@
         </div>
         <div class="card-body">
             <?php $u = $detalle['info_usuario']; ?>
-            <div class="row">
-                <div class="col-md-6">
+            <div class="row g-3">
+                <div class="col-lg-6 col-12">
                     <table class="table table-borderless mb-0">
                         <tr>
-                            <th class="text-muted w-40">Nombre completo:</th>
+                            <th class="text-muted" style="width: 42%; min-width: 140px;">Nombre completo:</th>
                             <td class="fw-bold"><?= htmlspecialchars($u['nombre']) ?></td>
                         </tr>
                         <tr>
@@ -53,10 +53,10 @@
                         </tr>
                     </table>
                 </div>
-                <div class="col-md-6">
+                <div class="col-lg-6 col-12">
                     <table class="table table-borderless mb-0">
                         <tr>
-                            <th class="text-muted w-40">NIT predeterminado:</th>
+                            <th class="text-muted" style="width: 42%; min-width: 140px;">NIT predeterminado:</th>
                             <td><code><?= htmlspecialchars($u['nit_facturacion']) ?></code></td>
                         </tr>
                         <tr>
@@ -79,7 +79,7 @@
 
     <!-- Tarjetas de resumen acumulado -->
     <div class="row g-3 mb-4">
-        <div class="col-md-4">
+        <div class="col-md-4 col-12">
             <div class="card border-0 shadow-sm p-3 bg-success text-white">
                 <div class="small fw-bold text-uppercase">💰 Total gastado acumulado</div>
                 <h4 class="fw-bold mb-0">
@@ -87,13 +87,13 @@
                 </h4>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 col-12">
             <div class="card border-0 shadow-sm p-3 bg-primary text-white">
                 <div class="small fw-bold text-uppercase">🍽️ Total platillos reservados</div>
                 <h4 class="fw-bold mb-0"><?= (int)$detalle['total_platillos_reservados'] ?></h4>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 col-12">
             <div class="card border-0 shadow-sm p-3 bg-secondary text-white">
                 <div class="small fw-bold text-uppercase">❌ Reservas canceladas</div>
                 <h4 class="fw-bold mb-0"><?= (int)$detalle['total_reservas_canceladas'] ?></h4>

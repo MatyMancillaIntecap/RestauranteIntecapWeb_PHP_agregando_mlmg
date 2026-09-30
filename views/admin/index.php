@@ -25,7 +25,7 @@
     </div>
 
     <!-- // TARJETAS DE MÉTRICAS CON COLORES LLAMATIVOS, FUERTES Y LÍMITES CLAROS -->
-    <div class="row g-4 mb-4">
+    <div class="row g-3 g-md-4 mb-4">
 
         <!-- Platillos de Dieta (Azul Cyan Eléctrico) -->
         <div class="col-xl-3 col-md-6">
@@ -110,7 +110,7 @@
     </div>
 
     <!-- TARJETAS USUARIOS + LA CARTA CON COLORES LLAMATIVOS -->
-    <div class="row g-4 mb-4">
+    <div class="row g-3 g-md-4 mb-4">
         <!-- Usuarios del Sistema (Azul Marino Oscuro Pizarra) -->
         <div class="col-md-6">
             <div class="card shadow rounded-3 p-3 h-100 text-white"
@@ -200,8 +200,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
         </div>
     </div>
 

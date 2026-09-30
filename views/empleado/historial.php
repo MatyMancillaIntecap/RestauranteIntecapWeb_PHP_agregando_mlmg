@@ -26,22 +26,22 @@
     <div class="card shadow-sm rounded-3 mb-4 border-2" style="background: #f8fafc; border: 2px solid #cbd5e1 !important;">
         <div class="card-body p-3">
             <form method="get" action="<?= BASE_URL ?>/empleado/historial"
-                  class="row g-3 align-items-end">
-                <div class="col-md-4 col-6">
-                    <label class="form-label small fw-bold text-dark">Fecha Inicio:</label>
+                  class="row g-2 g-md-3 align-items-end">
+                <div class="col-md-4 col-sm-6 col-12">
+                    <label class="form-label small fw-bold text-dark mb-1">Fecha Inicio:</label>
                     <input type="date" name="fechaInicio" class="form-control"
                            value="<?= htmlspecialchars($fecha_inicio) ?>">
                 </div>
-                <div class="col-md-4 col-6">
-                    <label class="form-label small fw-bold text-dark">Fecha Fin:</label>
+                <div class="col-md-4 col-sm-6 col-12">
+                    <label class="form-label small fw-bold text-dark mb-1">Fecha Fin:</label>
                     <input type="date" name="fechaFin" class="form-control"
                            value="<?= htmlspecialchars($fecha_fin) ?>">
                 </div>
-                <div class="col-md-4 col-12 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary fw-bold w-100 shadow-sm">
+                <div class="col-md-4 col-12 d-flex gap-2 mt-2 mt-md-0">
+                    <button type="submit" class="btn btn-primary fw-bold flex-fill shadow-sm">
                         🔍 Filtrar
                     </button>
-                    <a href="<?= BASE_URL ?>/empleado/historial" class="btn btn-outline-secondary fw-bold">
+                    <a href="<?= BASE_URL ?>/empleado/historial" class="btn btn-outline-secondary fw-bold flex-fill text-center">
                         Limpiar
                     </a>
                 </div>
