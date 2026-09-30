@@ -187,10 +187,10 @@ class CocinaController extends Controller
         $writer->setTitle('RESERVAS DE COCINA');
         $writer->setSubtitle('Restaurante Escuela INTECAP · Fecha: ' . $fecha . ' · Generado: ' . date('d/m/Y H:i'));
         $writer->setHeaderColor('1F4E78');
-        $writer->setColumnWidths([6, 24, 28, 10, 14, 14, 14, 14, 22, 10, 10]);
+        $writer->setColumnWidths([6, 22, 26, 16, 24, 10, 14, 14, 14, 14, 20, 10, 10]);
         $writer->setPageLayout('landscape', 1, 1, 0.25, 0.25, 0.35, 0.35);
-        $writer->setIntegerColumns([0, 3]);
-        $writer->setHeaders(['#', 'Empleado', 'Platillo', 'Cantidad', 'Precio Unitario', 'Total', 'Pago en Efectivo', 'Pago con Carnet', 'Consumo en Restaurante / Para Llevar', 'Dieta', 'Normal']);
+        $writer->setIntegerColumns([0, 5]);
+        $writer->setHeaders(['#', 'Empleado', 'Correo Electrónico', 'Teléfono', 'Platillo', 'Cantidad', 'Precio Unitario', 'Total', 'Pago en Efectivo', 'Pago con Carnet', 'Consumo en Restaurante / Para Llevar', 'Dieta', 'Normal']);
 
         foreach ($filas as $item) {
             $totalFila = (float) $item['cantidad'] * (float) $item['precio_unitario'];
@@ -198,6 +198,8 @@ class CocinaController extends Controller
             $writer->addRow([
                 (int) $item['reserva_id'],
                 (string) $item['nombre_empleado'],
+                (string) ($item['email_empleado'] ?? ''),
+                (string) ($item['telefono_empleado'] ?? 'Sin registrar'),
                 (string) $item['nombre_plato'],
                 (int) $item['cantidad'],
                 (float) $item['precio_unitario'],
@@ -232,9 +234,14 @@ class CocinaController extends Controller
             $sumaCantidad += (int) $item['cantidad'];
             $sumaTotal += $totalFila;
 
+            $empleadoTexto = (string) $item['nombre_empleado'];
+            if (!empty($item['telefono_empleado'])) {
+                $empleadoTexto .= "\n" . $item['telefono_empleado'];
+            }
+
             $filasTabla[] = [
                 $item['reserva_id'],
-                $item['nombre_empleado'],
+                $empleadoTexto,
                 $item['nombre_plato'],
                 $item['cantidad'],
                 'Q ' . number_format((float) $item['precio_unitario'], 2),

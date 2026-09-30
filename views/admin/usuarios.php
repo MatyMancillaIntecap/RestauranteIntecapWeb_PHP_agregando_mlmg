@@ -75,6 +75,7 @@
                         <tr>
                             <th>Nombre Completo</th>
                             <th>Correo Electrónico</th>
+                            <th>Teléfono</th>
                             <th>Rol</th>
                             <th>Límite Almuerzos</th>
                             <th>NIT Facturación</th>
@@ -85,7 +86,7 @@
                     <tbody>
                         <?php if (empty($usuarios)): ?>
                             <tr>
-                                <td colspan="7" class="text-center py-4 text-muted">
+                                <td colspan="8" class="text-center py-4 text-muted">
                                     No se registran usuarios en el sistema.
                                 </td>
                             </tr>
@@ -96,6 +97,7 @@
                                     <div class="fw-bold"><?= htmlspecialchars($u['nombre']) ?></div>
                                 </td>
                                 <td><?= htmlspecialchars($u['email']) ?></td>
+                                <td><?= htmlspecialchars($u['telefono'] ?? '') ?: '<span class="text-muted">Sin registrar</span>' ?></td>
                                 <td>
                                     <?php
                                     $bgRol = match($u['nombre_rol']) {
@@ -189,6 +191,12 @@
                     </div>
 
                     <div class="mb-3">
+                        <label class="form-label fw-bold">Número de Teléfono</label>
+                        <input type="text" id="user_telefono" name="telefono" class="form-control"
+                               placeholder="Ej. 5555-1234">
+                    </div>
+
+                    <div class="mb-3">
                         <label class="form-label fw-bold">🔐 Contraseña</label>
                         <input type="password" id="user_password" name="password" class="form-control"
                                autocomplete="new-password"
@@ -249,6 +257,7 @@ function abrirModalNuevoUsuario() {
     document.getElementById('user_id').value                = 0;
     document.getElementById('user_nombre').value            = '';
     document.getElementById('user_email').value             = '';
+    document.getElementById('user_telefono').value          = '';
     document.getElementById('user_password').value          = '';
     document.getElementById('user_max_almuerzos').value     = 2;
     document.getElementById('user_nit').value               = 'C/F';
@@ -264,6 +273,7 @@ function abrirModalEditarUsuario(id) {
             document.getElementById('user_id').value            = data.id;
             document.getElementById('user_nombre').value        = data.nombre;
             document.getElementById('user_email').value         = data.email;
+            document.getElementById('user_telefono').value      = data.telefono || '';
             document.getElementById('user_password').value      = '';
             document.getElementById('user_rol').value           = data.rol_id;
             document.getElementById('user_max_almuerzos').value = data.max_almuerzos;

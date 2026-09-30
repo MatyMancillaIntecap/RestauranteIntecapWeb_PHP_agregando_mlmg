@@ -7,6 +7,13 @@
  */
 declare(strict_types=1);
 
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../services/AdminService.php';
+require_once __DIR__ . '/../services/CocinaService.php';
+require_once __DIR__ . '/../services/EmpleadoService.php';
+require_once __DIR__ . '/../services/ExcelWriter.php';
+require_once __DIR__ . '/../services/PdfWriter.php';
+
 class AdminController extends Controller
 {
     private AdminService $adminService;
@@ -213,7 +220,7 @@ class AdminController extends Controller
         $filas = $this->adminService->obtenerReporteGlobal($fechaInicio, $fechaFin, $usuarioId, $menuId);
         $writer = new ExcelWriter();
         $writer->setSheetName('ReporteGlobal');
-        $writer->setHeaders(['#Reserva', 'Fecha Reserva', 'Fecha Consumo', 'Usuario', 'Platillo', 'Cantidad', 'Precio Unit.', 'Total', 'Forma Pago', 'NIT', 'Estado']);
+        $writer->setHeaders(['#Reserva', 'Fecha Reserva', 'Fecha Consumo', 'Usuario', 'Correo Electrónico', 'Teléfono', 'Platillo', 'Cantidad', 'Precio Unit.', 'Total', 'Forma Pago', 'NIT', 'Estado']);
 
         foreach ($filas as $f) {
             $writer->addRow([
@@ -221,6 +228,8 @@ class AdminController extends Controller
                 (string) $f['fecha_reserva'],
                 (string) $f['fecha_consumo'],
                 (string) $f['usuario'],
+                (string) ($f['usuario_email'] ?? ''),
+                (string) ($f['usuario_telefono'] ?? 'Sin registrar'),
                 (string) $f['nombre_plato'],
                 (int) $f['cantidad'],
                 (float) $f['precio'],
@@ -259,11 +268,16 @@ class AdminController extends Controller
             $sumaCantidad += (int) $f['cantidad'];
             $sumaTotal += $totalFila;
 
+            $usuarioInfo = (string) $f['usuario'];
+            if (!empty($f['usuario_telefono'])) {
+                $usuarioInfo .= "\n" . $f['usuario_telefono'];
+            }
+
             $filasTabla[] = [
                 $f['id'],
                 date('d/m/Y H:i', strtotime((string) $f['fecha_reserva'])),
                 date('d/m/Y', strtotime((string) $f['fecha_consumo'])),
-                $f['usuario'],
+                $usuarioInfo,
                 $f['nombre_plato'],
                 $f['cantidad'],
                 'Q ' . number_format((float) $f['precio'], 2),
@@ -305,14 +319,15 @@ class AdminController extends Controller
         $writer->setTitle('GESTIÓN GENERAL DE USUARIOS');
         $writer->setSubtitle('Administra accesos, roles, estados, límites de platillos y NITs del personal.');
         $writer->setHeaderColor('0D6EFD');
-        $writer->setColumnWidths([30, 34, 18, 18, 14, 14]);
-        $writer->setHeaders(['Nombre Completo', 'Correo Electrónico', 'Rol', 'Límite Almuerzos', 'NIT Facturación', 'Estado']);
+        $writer->setColumnWidths([28, 30, 18, 16, 16, 14, 12]);
+        $writer->setHeaders(['Nombre Completo', 'Correo Electrónico', 'Teléfono', 'Rol', 'Límite Almuerzos', 'NIT Facturación', 'Estado']);
         $writer->setIntegerColumns([]);
 
         foreach ($usuarios as $u) {
             $writer->addRow([
                 (string) $u['nombre'],
                 (string) $u['email'],
+                (string) ($u['telefono'] ?? 'Sin registrar'),
                 (string) $u['nombre_rol'],
                 (int) $u['max_almuerzos'] === 0 ? 'Ilimitado' : (int) $u['max_almuerzos'] . ' / día',
                 (string) $u['nit_facturacion'],
@@ -346,12 +361,13 @@ class AdminController extends Controller
                 $u['id'],
                 $u['nombre'],
                 $u['email'],
+                $u['telefono'] ?? 'Sin registrar',
                 $u['nombre_rol'],
                 (int) $u['max_almuerzos'] === 0 ? 'Ilimitado' : $u['max_almuerzos'],
                 $u['activo'] ? 'Activo' : 'Inactivo',
             ];
         }
-        $pdf->setTable(['ID', 'Nombre', 'Correo', 'Rol', 'Límite', 'Estado'], $filas, [30, 115, 155, 85, 55, 83]);
+        $pdf->setTable(['ID', 'Nombre', 'Correo', 'Teléfono', 'Rol', 'Límite', 'Estado'], $filas, [25, 95, 125, 75, 75, 50, 60]);
 
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename="Usuarios_Sistema_' . date('Ymd') . '.pdf"');

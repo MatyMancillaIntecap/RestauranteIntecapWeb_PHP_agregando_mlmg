@@ -7,6 +7,8 @@
  */
 declare(strict_types=1);
 
+require_once __DIR__ . '/../services/EmpleadoService.php';
+
 class EmpleadoController extends Controller
 {
     private EmpleadoService $empleadoService;

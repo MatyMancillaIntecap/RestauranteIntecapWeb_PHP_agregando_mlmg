@@ -32,6 +32,10 @@
                             <td><?= htmlspecialchars($u['email']) ?></td>
                         </tr>
                         <tr>
+                            <th class="text-muted">Número de teléfono:</th>
+                            <td><?= htmlspecialchars($u['telefono'] ?? '') ?: '<span class="text-muted">Sin registrar</span>' ?></td>
+                        </tr>
+                        <tr>
                             <th class="text-muted">Rol asignado:</th>
                             <td>
                                 <span class="badge bg-primary fs-6">

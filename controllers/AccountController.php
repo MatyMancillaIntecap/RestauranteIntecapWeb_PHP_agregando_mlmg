@@ -47,6 +47,7 @@ class AccountController extends Controller
                 'id' => $usuario->id,
                 'nombre' => $usuario->nombre,
                 'email' => $usuario->email,
+                'telefono' => $usuario->telefono,
                 'rol_nombre' => $usuario->rol_nombre,
             ]);
 

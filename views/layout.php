@@ -153,10 +153,10 @@
 
                 <?php if (Auth::check()): ?>
                     <div class="d-flex align-items-center text-white gap-2 flex-wrap mt-2 mt-lg-0">
-                        <div class="user-badge d-flex align-items-center me-1">
-                            <i class="bi bi-person-circle fs-5 me-2 text-warning"></i>
+                        <div class="user-badge d-flex align-items-center me-1 flex-wrap gap-1">
+                            <i class="bi bi-person-circle fs-5 me-1 text-warning"></i>
                             <span class="fw-bold"><?= htmlspecialchars(Auth::user()['nombre']) ?></span>
-                            <span class="ms-2 badge bg-light text-dark small">
+                            <span class="badge bg-light text-dark small">
                                 <?= htmlspecialchars(Auth::role() ?? '') ?>
                             </span>
                         </div>

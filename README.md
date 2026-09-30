@@ -672,4 +672,23 @@ Se llevó a cabo una renovación visual integral en todas las pantallas y compon
 
 ---
 
+## 16. Agrupación de Usuarios por Rol e Integración Limpia de Teléfono
+
+A petición de las directrices institucionales, se perfeccionó la administración del padrón de usuarios:
+
+### 1. Usuarios Agrupados por Rol (Sin Columnas Innecesarias)
+- **Orden Agrupado en Base de Datos y Vistas**: Los usuarios ya no aparecen revueltos alfabéticamente; ahora se ordenan y agrupan estrictamente por su rol institucional:
+  1. 🛡️ **Administradores** (todos juntos al inicio)
+  2. 👨‍🍳 **Personal de Cocina** (todos juntos a continuación)
+  3. 👤 **Empleados** (todos juntos en su propio bloque)
+- **Separadores Visuales de Rol en Tabla**: En `views/admin/usuarios.php`, la tabla incluye cabeceras divisorias de grupo con acento cromático e indicación del número de integrantes de cada rol, manteniendo una tabla limpia sin agregar columnas redundantes.
+
+### 2. Integración Limpia del Teléfono (Formato Idéntico a Correo)
+- **Columna Teléfono**: Agregada inmediatamente después del correo electrónico en la tabla del padrón.
+- **Presentación Sobria y Legible ("Sin tanta cosa")**: El número de teléfono se muestra como texto limpio y directo (ej. `5555-1234`), en perfecta simetría y armonía con la columna de correo electrónico.
+- **Formularios de Creación y Edición**: Campo de texto normalizado en el modal de usuarios (`#user_telefono`), con persistencia directa en MySQL.
+- **Ficha de Detalle y Exportaciones**: El teléfono está disponible en la ficha completa del usuario (`/admin/detalle-usuario/{id}`) y en los reportes descargables de Excel (.xlsx), PDF (.pdf) y CSV.
+
+---
+
 *Documentación generada — Proyecto Restaurante Escuela INTECAP · PHP 8.2 MVC · Completamente independiente y adaptado a dispositivos móviles y de escritorio*

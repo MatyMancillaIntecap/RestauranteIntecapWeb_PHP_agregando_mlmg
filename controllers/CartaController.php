@@ -8,9 +8,10 @@ declare(strict_types=1);
  * gestión completa de productos y recuento consolidado de reservas.
  */
 
-require_once ROOT_PATH . '/services/CartaService.php';
-require_once ROOT_PATH . '/services/ExcelWriter.php';
-require_once ROOT_PATH . '/services/PdfWriter.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../services/CartaService.php';
+require_once __DIR__ . '/../services/ExcelWriter.php';
+require_once __DIR__ . '/../services/PdfWriter.php';
 
 class CartaController extends Controller
 {
@@ -68,7 +69,7 @@ class CartaController extends Controller
 
         // Lista de usuarios activos para permitir que el administrador reserve por sí mismo o para un comensal
         $db = Database::getConnection();
-        $stmtUsuarios = $db->query('SELECT id, nombre, email FROM usuarios WHERE activo = 1 ORDER BY nombre ASC');
+        $stmtUsuarios = $db->query('SELECT id, nombre, email, telefono FROM usuarios WHERE activo = 1 ORDER BY nombre ASC');
         $usuarios = $stmtUsuarios->fetchAll();
 
         $this->render('carta/admin', [
@@ -302,13 +303,14 @@ class CartaController extends Controller
         $subtitulo .= ' · Generado: ' . date('d/m/Y H:i');
         $writer->setSubtitle($subtitulo);
         $writer->setHeaderColor('1F4E78');
-        $writer->setColumnWidths([10, 24, 28, 20, 24, 18, 18, 14, 18, 14, 20]);
+        $writer->setColumnWidths([10, 24, 28, 16, 20, 24, 18, 18, 14, 18, 14, 20]);
         $writer->setPageLayout('landscape', 1, 1, 0.25, 0.25, 0.35, 0.35);
         $writer->setIntegerColumns([0]);
         $writer->setHeaders([
             '# Reserva',
             'Comensal / Usuario',
             'Correo Electrónico',
+            'Teléfono',
             'Entrada',
             'Plato Fuerte',
             'Bebida',
@@ -328,6 +330,7 @@ class CartaController extends Controller
                 (int) $item['id'],
                 (string) ($item['usuario_nombre'] ?? 'Usuario'),
                 (string) ($item['usuario_email'] ?? ''),
+                (string) ($item['usuario_telefono'] ?? 'Sin registrar'),
                 (string) ($item['entrada_nombre'] ?? '—'),
                 (string) ($item['plato_fuerte_nombre'] ?? '—'),
                 (string) ($item['bebida_nombre'] ?? '—'),
@@ -343,6 +346,7 @@ class CartaController extends Controller
         $writer->setTotalRow([
             'TOTAL',
             count($filas) . ' reservas',
+            '',
             '',
             '',
             '',
@@ -385,9 +389,14 @@ class CartaController extends Controller
             if (!empty($item['postre_id'])) $conteoPlatos++;
             $totalPlatillos += $conteoPlatos;
 
+            $comensalInfo = (string) ($item['usuario_nombre'] ?? 'Usuario');
+            if (!empty($item['usuario_telefono'])) {
+                $comensalInfo .= "\n" . $item['usuario_telefono'];
+            }
+
             $filasTabla[] = [
                 '#' . $item['id'],
-                $item['usuario_nombre'] ?? 'Usuario',
+                $comensalInfo,
                 $item['entrada_nombre'] ?? '—',
                 $item['plato_fuerte_nombre'] ?? '—',
                 $item['bebida_nombre'] ?? '—',

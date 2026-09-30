@@ -31,14 +31,17 @@ if ($stmt->fetch()) {
     exit;
 }
 
+$telefono = '2410-8900';
+
 $insert = $pdo->prepare(
-    'INSERT INTO usuarios (nombre, email, password, rol_id, activo, nit_facturacion)
-     VALUES (:nombre, :email, :password, :rol_id, 1, :nit)'
+    'INSERT INTO usuarios (nombre, email, telefono, password, rol_id, activo, nit_facturacion)
+     VALUES (:nombre, :email, :telefono, :password, :rol_id, 1, :nit)'
 );
 
 $insert->execute([
     'nombre' => $nombre,
     'email' => $email,
+    'telefono' => $telefono,
     'password' => $hash,
     'rol_id' => $rolId,
     'nit' => 'C/F',

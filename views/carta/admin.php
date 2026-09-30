@@ -448,6 +448,9 @@ $estilosCategorias = [
                                             <td>
                                                 <div class="fw-bold text-dark"><?= htmlspecialchars($rd['usuario_nombre'] ?? 'Usuario') ?></div>
                                                 <div class="text-muted"><?= htmlspecialchars($rd['usuario_email'] ?? '') ?></div>
+                                                <?php if (!empty($rd['usuario_telefono'])): ?>
+                                                    <div class="text-muted"><?= htmlspecialchars($rd['usuario_telefono']) ?></div>
+                                                <?php endif; ?>
                                             </td>
                                             <td><?= htmlspecialchars($rd['entrada_nombre'] ?? '—') ?></td>
                                             <td><?= htmlspecialchars($rd['plato_fuerte_nombre'] ?? '—') ?></td>
@@ -632,13 +635,13 @@ $estilosCategorias = [
                 <div class="mb-3 p-3 bg-light rounded-3 border">
                     <label class="form-label fw-bold small text-dark mb-1">👤 Reservar en nombre de:</label>
                     <select id="admin_reserva_usuario" class="form-select form-select-sm">
-                        <option value="<?= Auth::id() ?>" selected>Mí mismo (Administrador: <?= htmlspecialchars(Auth::user()['nombre'] ?? 'Admin') ?>)</option>
+                        <option value="<?= Auth::id() ?>" selected>Mí mismo (Administrador: <?= htmlspecialchars(Auth::user()['nombre'] ?? 'Admin') ?><?= !empty(Auth::user()['telefono']) ? ' | ' . htmlspecialchars(Auth::user()['telefono']) : '' ?>)</option>
                         <?php if (!empty($usuarios)): ?>
                             <optgroup label="Otros Comensales / Empleados">
                                 <?php foreach ($usuarios as $u): ?>
                                     <?php if ((int)$u['id'] !== (int)Auth::id()): ?>
                                         <option value="<?= (int)$u['id'] ?>">
-                                            <?= htmlspecialchars($u['nombre']) ?> (<?= htmlspecialchars($u['email'] ?? '') ?>)
+                                            <?= htmlspecialchars($u['nombre']) ?> (<?= htmlspecialchars($u['email'] ?? '') ?><?= !empty($u['telefono']) ? ' | ' . htmlspecialchars($u['telefono']) : '' ?>)
                                         </option>
                                     <?php endif; ?>
                                 <?php endforeach; ?>

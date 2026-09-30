@@ -349,7 +349,10 @@
                                             <td><?= $correlativo++ ?></td>
                                             <td>
                                                 <div class="fw-bold"><?= htmlspecialchars($r['nombre_empleado']) ?></div>
-                                                <small class="text-muted"><?= htmlspecialchars($r['email_empleado']) ?></small>
+                                                <small class="text-muted d-block"><?= htmlspecialchars($r['email_empleado']) ?></small>
+                                                <?php if (!empty($r['telefono_empleado'])): ?>
+                                                    <small class="text-muted d-block"><?= htmlspecialchars($r['telefono_empleado']) ?></small>
+                                                <?php endif; ?>
                                             </td>
                                             <td>
                                                 <span class="badge bg-secondary fs-6">

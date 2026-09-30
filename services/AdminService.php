@@ -29,7 +29,7 @@ class AdminService
         }
 
         $stmt = $this->db->prepare(
-            'SELECT u.id, u.nombre, u.email, u.rol_id, r.nombre AS nombre_rol, u.activo,
+            'SELECT u.id, u.nombre, u.email, u.telefono, u.rol_id, r.nombre AS nombre_rol, u.activo,
                     u.nit_facturacion, r.max_almuerzos, u.fecha_creacion
              FROM usuarios u
              INNER JOIN roles r ON r.id = u.rol_id
@@ -41,16 +41,16 @@ class AdminService
         return $row ?: null;
     }
 
-    // Obtiene todos los usuarios ordenados alfabéticamente por nombre
-    /** Devuelve todos los usuarios ordenados por nombre. */
+    // Obtiene todos los usuarios agrupados por rol (Administrador, Cocina, Empleado) y ordenados alfabéticamente
+    /** Devuelve todos los usuarios agrupados por rol y ordenados por nombre. */
     public function obtenerTodosLosUsuarios(): array
     {
         $stmt = $this->db->query(
-            'SELECT u.id, u.nombre, u.email, u.rol_id, r.nombre AS nombre_rol, u.activo,
+            "SELECT u.id, u.nombre, u.email, u.telefono, u.rol_id, r.nombre AS nombre_rol, u.activo,
                     u.nit_facturacion, r.max_almuerzos, u.fecha_creacion
              FROM usuarios u
              INNER JOIN roles r ON r.id = u.rol_id
-             ORDER BY u.nombre ASC'
+             ORDER BY FIELD(r.nombre, 'Administrador', 'Cocina', 'Empleado'), u.nombre ASC"
         );
 
         return $stmt->fetchAll();
@@ -61,7 +61,7 @@ class AdminService
     public function obtenerUsuarioPorId(int $id): ?array
     {
         $stmt = $this->db->prepare(
-            'SELECT u.id, u.nombre, u.email, u.rol_id, u.activo, u.nit_facturacion, r.max_almuerzos
+            'SELECT u.id, u.nombre, u.email, u.telefono, u.rol_id, u.activo, u.nit_facturacion, r.max_almuerzos
              FROM usuarios u
              INNER JOIN roles r ON r.id = u.rol_id
              WHERE u.id = :id'
@@ -79,6 +79,7 @@ class AdminService
         $id = (int) ($dto['id'] ?? 0);
         $nombre = trim((string) ($dto['nombre'] ?? ''));
         $email = trim((string) ($dto['email'] ?? ''));
+        $telefono = trim((string) ($dto['telefono'] ?? '')) ?: null;
         $rolId = (int) ($dto['rol_id'] ?? 0);
         $activo = (bool) ($dto['activo'] ?? true);
         $nit = trim((string) ($dto['nit_facturacion'] ?? '')) ?: 'C/F';
@@ -97,12 +98,13 @@ class AdminService
             $hash = password_hash($contrasenaInicial, PASSWORD_BCRYPT);
 
             $insert = $this->db->prepare(
-                'INSERT INTO usuarios (nombre, email, password, rol_id, activo, nit_facturacion, fecha_creacion)
-                 VALUES (:nombre, :email, :password, :rol_id, :activo, :nit, NOW())'
+                'INSERT INTO usuarios (nombre, email, telefono, password, rol_id, activo, nit_facturacion, fecha_creacion)
+                 VALUES (:nombre, :email, :telefono, :password, :rol_id, :activo, :nit, NOW())'
             );
             $insert->execute([
                 'nombre' => $nombre,
                 'email' => $email,
+                'telefono' => $telefono,
                 'password' => $hash,
                 'rol_id' => $rolId,
                 'activo' => $activo ? 1 : 0,
@@ -121,10 +123,11 @@ class AdminService
             return [false, 'El usuario no existe.'];
         }
 
-        $sql = 'UPDATE usuarios SET nombre = :nombre, email = :email, rol_id = :rol_id, activo = :activo, nit_facturacion = :nit';
+        $sql = 'UPDATE usuarios SET nombre = :nombre, email = :email, telefono = :telefono, rol_id = :rol_id, activo = :activo, nit_facturacion = :nit';
         $params = [
             'nombre' => $nombre,
             'email' => $email,
+            'telefono' => $telefono,
             'rol_id' => $rolId,
             'activo' => $activo ? 1 : 0,
             'nit' => $nit,
@@ -329,7 +332,7 @@ class AdminService
         ?int $usuarioId = null,
         ?int $menuId = null
     ): array {
-        $sql = 'SELECT r.id, r.fecha_reserva, r.fecha_consumo, u.nombre AS usuario, m.nombre_plato,
+        $sql = 'SELECT r.id, r.fecha_reserva, r.fecha_consumo, u.nombre AS usuario, u.email AS usuario_email, u.telefono AS usuario_telefono, m.nombre_plato,
                        r.cantidad, m.precio, fp.nombre AS forma_pago, r.nit_facturacion, r.estado
                 FROM reservas r
                 INNER JOIN usuarios u ON u.id = r.usuario_id
@@ -371,7 +374,7 @@ class AdminService
         ?string $estado,
         ?int $menuId = null
     ): string {
-        $sql = 'SELECT r.id, r.fecha_reserva, r.fecha_consumo, u.nombre AS usuario, m.nombre_plato,
+        $sql = 'SELECT r.id, r.fecha_reserva, r.fecha_consumo, u.nombre AS usuario, u.email AS usuario_email, u.telefono AS usuario_telefono, m.nombre_plato,
                        r.cantidad, m.precio, fp.nombre AS forma_pago, r.nit_facturacion, r.estado
                 FROM reservas r
                 INNER JOIN usuarios u ON u.id = r.usuario_id
@@ -408,11 +411,11 @@ class AdminService
         $filas = $stmt->fetchAll();
 
         $handle = fopen('php://temp', 'w+');
-        fputcsv($handle, ['#Reserva', 'Fecha Reserva', 'Fecha Consumo', 'Usuario', 'Platillo', 'Cantidad', 'Precio Unit.', 'Total', 'Forma Pago', 'NIT', 'Estado']);
+        fputcsv($handle, ['#Reserva', 'Fecha Reserva', 'Fecha Consumo', 'Usuario', 'Correo', 'Teléfono', 'Platillo', 'Cantidad', 'Precio Unit.', 'Total', 'Forma Pago', 'NIT', 'Estado']);
 
         foreach ($filas as $f) {
             fputcsv($handle, [
-                $f['id'], $f['fecha_reserva'], $f['fecha_consumo'], $f['usuario'], $f['nombre_plato'],
+                $f['id'], $f['fecha_reserva'], $f['fecha_consumo'], $f['usuario'], $f['usuario_email'], ($f['usuario_telefono'] ?? 'Sin registrar'), $f['nombre_plato'],
                 $f['cantidad'], $f['precio'], $f['cantidad'] * $f['precio'], $f['forma_pago'], $f['nit_facturacion'], $f['estado'],
             ]);
         }
@@ -431,11 +434,11 @@ class AdminService
         $usuarios = $this->obtenerTodosLosUsuarios();
 
         $handle = fopen('php://temp', 'w+');
-        fputcsv($handle, ['#ID', 'Nombre', 'Correo', 'Rol', 'Límite Almuerzos', 'NIT', 'Estado', 'Fecha Creación']);
+        fputcsv($handle, ['#ID', 'Nombre', 'Correo', 'Teléfono', 'Rol', 'Límite Almuerzos', 'NIT', 'Estado', 'Fecha Creación']);
 
         foreach ($usuarios as $u) {
             fputcsv($handle, [
-                $u['id'], $u['nombre'], $u['email'], $u['nombre_rol'],
+                $u['id'], $u['nombre'], $u['email'], ($u['telefono'] ?? 'Sin registrar'), $u['nombre_rol'],
                 $u['max_almuerzos'] == 0 ? 'Ilimitado' : $u['max_almuerzos'],
                 $u['nit_facturacion'], $u['activo'] ? 'Activo' : 'Inactivo', $u['fecha_creacion'],
             ]);

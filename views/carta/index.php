@@ -20,35 +20,35 @@ $iconosCategorias = [
     'Postre' => '🍰',
 ];
 
-// // DEFINICIÓN DE COLORES LLAMATIVOS Y FUERTES POR CATEGORÍA
+// DEFINICIÓN DE COLORES LLAMATIVOS Y FUERTES POR CATEGORÍA
 $estilosCategorias = [
     'Entrada' => [
         'bg_gradient' => 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
         'border' => '#d97706',
         'bg_card' => '#fffdf5',
         'badge' => '#b45309',
-        'badge_label' => 'bg-white text-dark'
+        'badge_label' => 'bg-white text-dark',
     ],
     'Plato fuerte' => [
         'bg_gradient' => 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
         'border' => '#dc2626',
         'bg_card' => '#fff5f5',
         'badge' => '#991b1b',
-        'badge_label' => 'bg-white text-dark'
+        'badge_label' => 'bg-white text-dark',
     ],
     'Bebida' => [
         'bg_gradient' => 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)',
         'border' => '#0284c7',
         'bg_card' => '#f0f9ff',
         'badge' => '#075985',
-        'badge_label' => 'bg-white text-dark'
+        'badge_label' => 'bg-white text-dark',
     ],
     'Postre' => [
         'bg_gradient' => 'linear-gradient(135deg, #7e22ce 0%, #a855f7 100%)',
         'border' => '#7e22ce',
         'bg_card' => '#faf5ff',
         'badge' => '#581c87',
-        'badge_label' => 'bg-white text-dark'
+        'badge_label' => 'bg-white text-dark',
     ],
 ];
 ?>

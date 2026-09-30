@@ -616,7 +616,7 @@ class CartaService
      */
     public function obtenerReservasDetalladas(?string $fecha = null): array
     {
-        $sql = 'SELECT cr.*, u.nombre AS usuario_nombre, u.email AS usuario_email,
+        $sql = 'SELECT cr.*, u.nombre AS usuario_nombre, u.email AS usuario_email, u.telefono AS usuario_telefono,
                        pe.nombre AS entrada_nombre, pe.precio AS entrada_precio,
                        pf.nombre AS plato_fuerte_nombre, pf.precio AS plato_fuerte_precio,
                        pb.nombre AS bebida_nombre, pb.precio AS bebida_precio,

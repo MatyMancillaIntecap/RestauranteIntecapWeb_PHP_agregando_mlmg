@@ -16,12 +16,14 @@ $usuarios = [
     [
         'nombre' => 'Usuario Cocina',
         'email' => 'cocina@intecap.edu.gt',
+        'telefono' => '5521-4433',
         'password' => '12345678',
         'rol_id' => 2,
     ],
     [
         'nombre' => 'Empleado de Prueba',
         'email' => 'empleado@intecap.edu.gt',
+        'telefono' => '5123-4567',
         'password' => '12345678',
         'rol_id' => 3,
     ],
@@ -29,8 +31,8 @@ $usuarios = [
 
 $buscar = $pdo->prepare('SELECT id FROM usuarios WHERE email = :email');
 $insertar = $pdo->prepare(
-    'INSERT INTO usuarios (nombre, email, password, rol_id, activo, nit_facturacion)
-     VALUES (:nombre, :email, :password, :rol_id, 1, :nit)'
+    'INSERT INTO usuarios (nombre, email, telefono, password, rol_id, activo, nit_facturacion)
+     VALUES (:nombre, :email, :telefono, :password, :rol_id, 1, :nit)'
 );
 
 foreach ($usuarios as $usuario) {
@@ -44,6 +46,7 @@ foreach ($usuarios as $usuario) {
     $insertar->execute([
         'nombre' => $usuario['nombre'],
         'email' => $usuario['email'],
+        'telefono' => $usuario['telefono'],
         'password' => password_hash($usuario['password'], PASSWORD_BCRYPT),
         'rol_id' => $usuario['rol_id'],
         'nit' => 'C/F',

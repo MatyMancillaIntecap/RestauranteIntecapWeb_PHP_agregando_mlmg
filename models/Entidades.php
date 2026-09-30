@@ -35,6 +35,7 @@ class Usuario
     public int $id = 0;
     public string $nombre = '';
     public string $email = '';
+    public ?string $telefono = null; // Número de teléfono del usuario
     public string $password = '';
     public int $rol_id = 0;
     public bool $activo = true;
@@ -49,6 +50,7 @@ class Usuario
         $u->id = (int) $row['id'];
         $u->nombre = $row['nombre'];
         $u->email = $row['email'];
+        $u->telefono = $row['telefono'] ?? null;
         $u->password = $row['password'];
         $u->rol_id = (int) $row['rol_id'];
         $u->activo = (bool) $row['activo'];
@@ -212,6 +214,7 @@ class CartaReserva
     public string $nit_facturacion = 'C/F';
     public ?string $usuario_nombre = null;
     public ?string $usuario_email = null;
+    public ?string $usuario_telefono = null;
 
     /** Convierte una fila SQL en una entidad CartaReserva. */
     public static function fromRow(array $row): self
@@ -231,6 +234,7 @@ class CartaReserva
         $r->nit_facturacion = (string) ($row['nit_facturacion'] ?? 'C/F');
         $r->usuario_nombre = $row['usuario_nombre'] ?? null;
         $r->usuario_email = $row['usuario_email'] ?? null;
+        $r->usuario_telefono = $row['usuario_telefono'] ?? null;
         return $r;
     }
 }

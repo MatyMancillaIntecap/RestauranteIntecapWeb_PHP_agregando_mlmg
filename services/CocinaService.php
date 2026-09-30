@@ -131,7 +131,7 @@ class CocinaService
     public function obtenerReservasDetalladasPorFecha(string $fecha): array
     {
         $stmt = $this->db->prepare(
-            "SELECT r.id AS reserva_id, u.nombre AS nombre_empleado, u.email AS email_empleado,
+            "SELECT r.id AS reserva_id, u.nombre AS nombre_empleado, u.email AS email_empleado, u.telefono AS telefono_empleado,
                     m.nombre_plato, m.precio AS precio_unitario, m.es_dieta, r.cantidad, r.donde_consume, fp.nombre AS forma_pago,
                     r.fecha_reserva, r.estado, m.estado AS estado_platillo
              FROM reservas r
@@ -176,11 +176,11 @@ class CocinaService
         $detalles = $this->obtenerReservasDetalladasPorFecha($fecha);
 
         $handle = fopen('php://temp', 'w+');
-        fputcsv($handle, ['#', 'Empleado', 'Plato', 'Cantidad', 'Dónde consume', 'Forma de Pago', 'Hora Reserva', 'Estado Platillo']);
+        fputcsv($handle, ['#', 'Empleado', 'Correo', 'Teléfono', 'Plato', 'Cantidad', 'Dónde consume', 'Forma de Pago', 'Hora Reserva', 'Estado Platillo']);
 
         foreach ($detalles as $item) {
             fputcsv($handle, [
-                $item['reserva_id'], $item['nombre_empleado'], $item['nombre_plato'], $item['cantidad'],
+                $item['reserva_id'], $item['nombre_empleado'], $item['email_empleado'], ($item['telefono_empleado'] ?? 'Sin registrar'), $item['nombre_plato'], $item['cantidad'],
                 $item['donde_consume'], $item['forma_pago'], $item['fecha_reserva'], $item['estado_platillo'],
             ]);
         }

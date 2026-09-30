@@ -16,6 +16,7 @@ class Auth
             'id' => (int) $usuario['id'],
             'nombre' => $usuario['nombre'],
             'email' => $usuario['email'],
+            'telefono' => $usuario['telefono'] ?? null,
             'rol' => $usuario['rol_nombre'],
         ];
         session_regenerate_id(true);
@@ -54,6 +55,12 @@ class Auth
     public static function role(): ?string
     {
         return $_SESSION['auth_user']['rol'] ?? null;
+    }
+
+    /** @return string|null Telefono del usuario actual. */
+    public static function telefono(): ?string
+    {
+        return $_SESSION['auth_user']['telefono'] ?? null;
     }
 
     /** Redirige al login cuando la solicitud no tiene una sesion valida. */
