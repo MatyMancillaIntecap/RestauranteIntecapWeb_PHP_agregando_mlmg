@@ -287,12 +287,80 @@ class CartaController extends Controller
     }
 
     // GET /carta/descargar-excel
-    // Genera el reporte de reservas y recuento consolidado de La Carta en formato XLSX (Excel nativo)
+    // Genera el reporte en formato XLSX (Excel nativo), ya sea del Catálogo o del Recuento Consolidado
     public function descargarExcel(): void
     {
         Auth::requireRole(['Administrador']);
 
-        $fecha = (string) $this->input('fecha', date('Y-m-d'));
+        $tab = (string) $this->input('tab', '');
+        $tipo = (string) $this->input('tipo', '');
+
+        // Reporte del Catálogo de La Carta
+        if ($tab === 'catalogo' || $tipo === 'catalogo') {
+            $productosPorCategoria = $this->cartaService->obtenerTodosAgrupadosPorCategoria(false);
+            $writer = new ExcelWriter();
+            $writer->setSheetName('CatalogoLaCarta');
+            $writer->setTitle('CATÁLOGO GENERAL DE PRODUCTOS - LA CARTA');
+            $writer->setSubtitle('Restaurante Escuela INTECAP · Generado: ' . date('d/m/Y H:i'));
+            $writer->setHeaderColor('1F4E78');
+            $writer->setColumnWidths([8, 16, 26, 32, 14, 12, 12, 18, 18, 12]);
+            $writer->setPageLayout('landscape', 1, 1, 0.25, 0.25, 0.35, 0.35);
+            $writer->setIntegerColumns([0, 5, 6]);
+            $writer->setHeaders([
+                '# ID',
+                'Categoría',
+                'Nombre del Producto',
+                'Descripción',
+                'Precio (Q)',
+                'Stock Inicial',
+                'Stock Disp.',
+                'Días Habilitados',
+                'Horario de Habilitación',
+                'Estado'
+            ]);
+
+            $totalProductos = 0;
+            foreach ($productosPorCategoria as $categoria => $prods) {
+                foreach ($prods as $p) {
+                    $totalProductos++;
+                    $horario = substr((string)$p['hora_inicio'], 0, 5) . ' a ' . substr((string)$p['hora_fin'], 0, 5);
+                    $writer->addRow([
+                        (int) $p['id'],
+                        (string) $categoria,
+                        (string) $p['nombre'],
+                        (string) ($p['descripcion'] ?? 'Sin descripción'),
+                        (float) $p['precio'],
+                        (int) ($p['stock'] ?? 0),
+                        (int) ($p['stock_disponible'] ?? 0),
+                        (string) ($p['dias_habilitados'] ?: 'Todos los días'),
+                        $horario,
+                        ((int)($p['estado'] ?? 1) === 1) ? 'Activo' : 'Inactivo',
+                    ]);
+                }
+            }
+
+            $writer->setTotalRow([
+                'TOTAL',
+                $totalProductos . ' productos',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                ''
+            ]);
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename="Catalogo_La_Carta_' . date('Ymd_His') . '.xlsx"');
+            echo $writer->generate();
+            exit;
+        }
+
+        // Reporte de Recuento Consolidado y Reservas
+        $fechaParam = $this->input('fecha');
+        $fecha = ($fechaParam !== null) ? trim((string) $fechaParam) : date('Y-m-d');
         $filas = $this->cartaService->obtenerReservasDetalladas($fecha !== '' ? $fecha : null);
 
         $writer = new ExcelWriter();
@@ -366,12 +434,62 @@ class CartaController extends Controller
     }
 
     // GET /carta/descargar-pdf
-    // Genera el reporte de reservas y recuento consolidado de La Carta en formato PDF nativo
+    // Genera el reporte de La Carta en formato PDF nativo
     public function descargarPdf(): void
     {
         Auth::requireRole(['Administrador']);
 
-        $fecha = (string) $this->input('fecha', date('Y-m-d'));
+        $tab = (string) $this->input('tab', '');
+        $tipo = (string) $this->input('tipo', '');
+
+        // Reporte del Catálogo de La Carta
+        if ($tab === 'catalogo' || $tipo === 'catalogo') {
+            $productosPorCategoria = $this->cartaService->obtenerTodosAgrupadosPorCategoria(false);
+            $filasTabla = [];
+            $totalProductos = 0;
+            $totalActivos = 0;
+
+            foreach ($productosPorCategoria as $categoria => $prods) {
+                foreach ($prods as $p) {
+                    $totalProductos++;
+                    if ((int)($p['estado'] ?? 1) === 1) $totalActivos++;
+                    $horario = substr((string)$p['hora_inicio'], 0, 5) . '-' . substr((string)$p['hora_fin'], 0, 5);
+                    $stockTexto = (int)($p['stock_disponible'] ?? 0) . ' / ' . (int)($p['stock'] ?? 0);
+                    $filasTabla[] = [
+                        (string) $categoria,
+                        (string) $p['nombre'],
+                        'Q ' . number_format((float) $p['precio'], 2),
+                        $stockTexto,
+                        (string) ($p['dias_habilitados'] ?: 'Todos') . ' (' . $horario . ')',
+                        ((int)($p['estado'] ?? 1) === 1) ? 'Activo' : 'Inactivo',
+                    ];
+                }
+            }
+
+            $pdf = new PdfWriter('Catálogo General de La Carta');
+            $pdf->addLine('Restaurante Escuela INTECAP · Generado: ' . date('d/m/Y H:i'));
+            $pdf->setSummary([
+                'Categorías' => (string) count(CartaService::CATEGORIAS),
+                'Total Productos' => (string) $totalProductos,
+                'Productos Activos' => (string) $totalActivos,
+            ]);
+            $pdf->setTable(
+                ['Categoría', 'Producto', 'Precio', 'Stock (Disp/Tot)', 'Días y Horarios', 'Estado'],
+                $filasTabla,
+                [75, 125, 55, 65, 120, 55]
+            );
+            $pdf->setColumnAlignments(['left', 'left', 'right', 'center', 'left', 'center']);
+
+            header('Content-Type: application/pdf');
+            $filename = 'Catalogo_La_Carta_' . date('Ymd_His') . '.pdf';
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            echo $pdf->generate();
+            exit;
+        }
+
+        // Reporte de Recuento Consolidado y Reservas
+        $fechaParam = $this->input('fecha');
+        $fecha = ($fechaParam !== null) ? trim((string) $fechaParam) : date('Y-m-d');
         $filas = $this->cartaService->obtenerReservasDetalladas($fecha !== '' ? $fecha : null);
 
         $sumaTotal = 0.0;

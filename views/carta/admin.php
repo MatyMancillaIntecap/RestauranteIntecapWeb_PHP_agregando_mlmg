@@ -72,9 +72,16 @@ $estilosCategorias = [
                     </p>
                 </div>
                 <div class="col-md-6 col-12 text-md-end mt-3 mt-md-0 d-flex gap-2 justify-content-md-end flex-wrap">
-                    <!-- Opción Vista Cliente -->
-                    <a href="<?= BASE_URL ?>/carta/index" class="btn btn-light text-primary fw-bold shadow-sm flex-fill flex-md-grow-0 text-center">
-                        👁️ Ver Vista Cliente
+                    <!-- Botones de descarga de reportes oficiales -->
+                    <a id="btnDescargarPdfHeader"
+                       href="<?= BASE_URL ?>/carta/descargar-pdf?tab=<?= urlencode($tabActiva) ?><?= ($tabActiva === 'consolidado' && $fechaFiltro !== '') ? '&fecha=' . urlencode($fechaFiltro) : '' ?>"
+                       class="btn btn-danger fw-bold text-nowrap shadow-sm flex-fill flex-md-grow-0 text-center">
+                        📄 Descargar PDF
+                    </a>
+                    <a id="btnDescargarExcelHeader"
+                       href="<?= BASE_URL ?>/carta/descargar-excel?tab=<?= urlencode($tabActiva) ?><?= ($tabActiva === 'consolidado' && $fechaFiltro !== '') ? '&fecha=' . urlencode($fechaFiltro) : '' ?>"
+                       class="btn btn-success fw-bold text-nowrap shadow-sm flex-fill flex-md-grow-0 text-center">
+                        📊 Descargar Excel
                     </a>
                     <!-- El administrador también puede realizar una reserva desde aquí -->
                     <button type="button" class="btn btn-warning text-dark fw-bold shadow-sm flex-fill flex-md-grow-0 text-center" onclick="abrirModalReservaAdmin()">
@@ -1085,4 +1092,32 @@ $estilosCategorias = [
             alert('Ocurrió un error al intentar eliminar el producto.');
         });
     }
+
+    // Actualizar dinámicamente los botones superiores de descarga según la pestaña activa
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnPdf = document.getElementById('btnDescargarPdfHeader');
+        const btnExcel = document.getElementById('btnDescargarExcelHeader');
+        const fechaFiltroActual = '<?= htmlspecialchars($fechaFiltro, ENT_QUOTES) ?>';
+
+        function actualizarBotonesDescarga(tabName) {
+            if (!btnPdf || !btnExcel) return;
+            if (tabName === 'consolidado') {
+                const queryFecha = fechaFiltroActual !== '' ? '&fecha=' + encodeURIComponent(fechaFiltroActual) : '';
+                btnPdf.href = baseUrl + '/carta/descargar-pdf?tab=consolidado' + queryFecha;
+                btnExcel.href = baseUrl + '/carta/descargar-excel?tab=consolidado' + queryFecha;
+            } else {
+                btnPdf.href = baseUrl + '/carta/descargar-pdf?tab=catalogo';
+                btnExcel.href = baseUrl + '/carta/descargar-excel?tab=catalogo';
+            }
+        }
+
+        const tabCatalogoBtn = document.getElementById('catalogo-tab');
+        const tabConsolidadoBtn = document.getElementById('consolidado-tab');
+        if (tabCatalogoBtn) {
+            tabCatalogoBtn.addEventListener('shown.bs.tab', () => actualizarBotonesDescarga('catalogo'));
+        }
+        if (tabConsolidadoBtn) {
+            tabConsolidadoBtn.addEventListener('shown.bs.tab', () => actualizarBotonesDescarga('consolidado'));
+        }
+    });
 </script>
