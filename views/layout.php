@@ -17,7 +17,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        .navbar-custom        { background: linear-gradient(135deg, #0a2647 0%, #123d6b 50%, #1e40af 100%) !important; padding: .55rem 1rem; z-index: 1030; }
+        .navbar-custom        { background: linear-gradient(135deg, #0a2647 0%, #123d6b 50%, #1e40af 100%) !important; padding: .55rem 1rem; }
         .nav-btn              {
             background-color: rgba(255,255,255,.14);
             color: #fff !important;
@@ -103,7 +103,7 @@
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
 
-<header class="sticky-top">
+<header>
     <nav class="navbar navbar-expand-xl navbar-dark navbar-custom shadow">
         <div class="container-fluid px-2 px-sm-3 px-lg-4">
             <a class="navbar-brand d-flex align-items-center fw-bold me-2 me-md-3"
