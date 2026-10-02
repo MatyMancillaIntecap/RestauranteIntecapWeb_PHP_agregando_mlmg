@@ -75,12 +75,12 @@
                         <tr>
                             <th>Nombre Completo</th>
                             <th>Correo Electrónico</th>
-                            <th>Teléfono</th>
-                            <th>Rol</th>
-                            <th>Límite Almuerzos</th>
-                            <th>NIT Facturación</th>
-                            <th>Estado</th>
-                            <th class="text-center pe-3">Acciones</th>
+                            <th class="cell-nowrap">Teléfono</th>
+                            <th class="cell-nowrap">Rol</th>
+                            <th class="cell-nowrap text-center">Límite Almuerzos</th>
+                            <th class="cell-nowrap text-center">NIT Facturación</th>
+                            <th class="cell-nowrap text-center">Estado</th>
+                            <th class="text-center cell-nowrap pe-3">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -97,8 +97,8 @@
                                     <div class="fw-bold"><?= htmlspecialchars($u['nombre']) ?></div>
                                 </td>
                                 <td><?= htmlspecialchars($u['email']) ?></td>
-                                <td><?= htmlspecialchars($u['telefono'] ?? '') ?: '<span class="text-muted">Sin registrar</span>' ?></td>
-                                <td>
+                                <td class="cell-nowrap"><?= htmlspecialchars($u['telefono'] ?? '') ?: '<span class="text-muted">Sin registrar</span>' ?></td>
+                                <td class="cell-nowrap">
                                     <?php
                                     $bgRol = match($u['nombre_rol']) {
                                         'Administrador' => 'background: #7c3aed; color: #fff;',
@@ -110,21 +110,21 @@
                                         <?= htmlspecialchars($u['nombre_rol']) ?>
                                     </span>
                                 </td>
-                                <td>
+                                <td class="cell-nowrap text-center">
                                     <span class="badge bg-secondary fs-6">
                                         <?= (int)$u['max_almuerzos'] === 0
                                             ? 'Ilimitado'
                                             : (int)$u['max_almuerzos'] . ' / día' ?>
                                     </span>
                                 </td>
-                                <td>
+                                <td class="cell-nowrap text-center">
                                     <span class="badge bg-light text-dark border">
                                         <?= htmlspecialchars($u['nit_facturacion']) ?>
                                     </span>
                                 </td>
-                                <td>
-                                    <!-- Toggle switch AJAX (como en el C#) -->
-                                    <div class="form-check form-switch">
+                                <td class="cell-nowrap text-center">
+                                    <!-- Toggle switch AJAX -->
+                                    <div class="form-check form-switch d-inline-block">
                                         <input class="form-check-input" type="checkbox" role="switch"
                                                id="sw_<?= (int)$u['id'] ?>"
                                                <?= $u['activo'] ? 'checked' : '' ?>
@@ -136,23 +136,25 @@
                                         </label>
                                     </div>
                                 </td>
-                                <td class="text-center pe-3">
-                                    <a href="<?= BASE_URL ?>/admin/detalle-usuario/<?= (int)$u['id'] ?>"
-                                       class="btn btn-sm btn-outline-info me-1 fw-bold" title="Ver Ficha Completa">
-                                        🔍 Detalle
-                                    </a>
-                                    <button class="btn btn-sm btn-outline-primary fw-bold"
-                                            onclick="abrirModalEditarUsuario(<?= (int)$u['id'] ?>)"
-                                            title="Editar Usuario">
-                                        ✏️ Editar
-                                    </button>
-                                    <?php if ((int) $u['id'] !== Auth::id()): ?>
-                                        <button class="btn btn-sm btn-outline-danger fw-bold ms-1"
-                                                onclick="eliminarUsuario(<?= (int)$u['id'] ?>)"
-                                                title="Eliminar Usuario">
-                                            🗑️ Eliminar
+                                <td class="text-center cell-nowrap pe-3">
+                                    <div class="btn-action-group justify-content-center">
+                                        <a href="<?= BASE_URL ?>/admin/detalle-usuario/<?= (int)$u['id'] ?>"
+                                           class="btn btn-sm btn-outline-info fw-bold" title="Ver Ficha Completa">
+                                            🔍 Detalle
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-primary fw-bold"
+                                                onclick="abrirModalEditarUsuario(<?= (int)$u['id'] ?>)"
+                                                title="Editar Usuario">
+                                            ✏️ Editar
                                         </button>
-                                    <?php endif; ?>
+                                        <?php if ((int) $u['id'] !== Auth::id()): ?>
+                                            <button class="btn btn-sm btn-outline-danger fw-bold"
+                                                    onclick="eliminarUsuario(<?= (int)$u['id'] ?>)"
+                                                    title="Eliminar Usuario">
+                                                🗑️ Eliminar
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -168,7 +170,7 @@
      MODAL — CREAR / EDITAR USUARIO
 ═══════════════════════════════════════════════════════ -->
 <div class="modal fade" id="modalUsuario" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title fw-bold" id="modalTitulo">➕ Crear Usuario</h5>

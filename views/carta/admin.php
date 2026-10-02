@@ -110,8 +110,8 @@ $estilosCategorias = [
             <div class="row">
 
                 <!-- Formulario lateral de NUEVO PRODUCTO / EDITAR PRODUCTO (AL LADO COMO EN COCINA) -->
-                <div class="col-lg-4 col-12 mb-4">
-                    <div class="card shadow rounded-3 border-2 sticky-top" id="cardFormularioLateral" style="top: 20px; z-index: 10;">
+                <div class="col-xl-4 col-lg-5 col-12 mb-4">
+                    <div class="card shadow rounded-3 border-2 sticky-panel-lg" id="cardFormularioLateral">
                         <div class="card-header text-white py-3" id="panelFormHeader"
                              style="background: linear-gradient(135deg, #15803d 0%, #16a34a 100%) !important;">
                             <h5 class="mb-0 fw-bold d-flex align-items-center justify-content-between flex-wrap gap-2">
@@ -234,7 +234,7 @@ $estilosCategorias = [
                 </div>
 
                 <!-- Catálogo general de categorías -->
-                <div class="col-lg-8 col-12">
+                <div class="col-xl-8 col-lg-7 col-12">
                     <div class="card shadow rounded-3 mb-4 border-2">
                         <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center"
                              style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;">
@@ -287,12 +287,12 @@ $estilosCategorias = [
                                                 <tr>
                                                     <th style="width: 70px;">Foto</th>
                                                     <th>Nombre del Producto</th>
-                                                    <th>Descripción</th>
-                                                    <th>Precio</th>
-                                                    <th>Stock</th>
-                                                    <th>Días y Horario de Habilitación</th>
-                                                    <th>Estado</th>
-                                                    <th class="text-center" style="width: 170px;">Acciones</th>
+                                                    <th style="min-width: 170px;">Descripción</th>
+                                                    <th class="cell-nowrap">Precio</th>
+                                                    <th class="cell-nowrap">Stock</th>
+                                                    <th class="cell-nowrap">Días y Horario</th>
+                                                    <th class="cell-nowrap">Estado</th>
+                                                    <th class="text-center cell-nowrap" style="min-width: 160px;">Acciones</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -320,16 +320,16 @@ $estilosCategorias = [
                                                             <div class="fw-bold text-dark"><?= htmlspecialchars($p['nombre']) ?></div>
                                                         </td>
                                                         <td>
-                                                            <span class="small text-muted">
+                                                            <div class="small text-muted text-truncate-2" style="max-width: 220px;" title="<?= htmlspecialchars($p['descripcion'] ?? '') ?>">
                                                                 <?= htmlspecialchars($p['descripcion'] ?? 'Sin descripción') ?>
-                                                            </span>
+                                                            </div>
                                                         </td>
-                                                        <td>
+                                                        <td class="cell-nowrap">
                                                             <span class="fw-bold text-primary">
                                                                 Q <?= number_format((float) $p['precio'], 2) ?>
                                                             </span>
                                                         </td>
-                                                        <td>
+                                                        <td class="cell-nowrap">
                                                             <div class="small">
                                                                 <strong><?= $stockDisp ?></strong> disp. / <?= (int)$p['stock'] ?> tot.
                                                             </div>
@@ -337,7 +337,7 @@ $estilosCategorias = [
                                                                 <span class="badge bg-danger small">Agotado</span>
                                                             <?php endif; ?>
                                                         </td>
-                                                        <td>
+                                                        <td class="cell-nowrap">
                                                             <div class="small fw-bold text-dark">
                                                                 <?= htmlspecialchars($p['dias_habilitados'] ?: 'Todos los días') ?>
                                                             </div>
@@ -355,7 +355,7 @@ $estilosCategorias = [
                                                                 <?php endif; ?>
                                                             </div>
                                                         </td>
-                                                        <td>
+                                                        <td class="cell-nowrap">
                                                             <div class="form-check form-switch">
                                                                 <input class="form-check-input" type="checkbox" role="switch"
                                                                        id="sw_prod_<?= $prodId ?>"
@@ -368,15 +368,17 @@ $estilosCategorias = [
                                                                 </label>
                                                             </div>
                                                         </td>
-                                                        <td class="text-center">
-                                                            <button type="button" class="btn btn-sm btn-outline-primary fw-bold me-1"
-                                                                    onclick="abrirModalEditarProducto(<?= $prodId ?>)">
-                                                                ✏️ Editar
-                                                            </button>
-                                                            <button type="button" class="btn btn-sm btn-outline-danger fw-bold"
-                                                                    onclick="eliminarProducto(<?= $prodId ?>, '<?= htmlspecialchars($p['nombre'], ENT_QUOTES) ?>')">
-                                                                🗑️ Eliminar
-                                                            </button>
+                                                        <td class="text-center cell-nowrap">
+                                                            <div class="btn-action-group justify-content-center">
+                                                                <button type="button" class="btn btn-sm btn-outline-primary fw-bold"
+                                                                        onclick="abrirModalEditarProducto(<?= $prodId ?>)">
+                                                                    ✏️ Editar
+                                                                </button>
+                                                                <button type="button" class="btn btn-sm btn-outline-danger fw-bold"
+                                                                        onclick="eliminarProducto(<?= $prodId ?>, '<?= htmlspecialchars($p['nombre'], ENT_QUOTES) ?>')">
+                                                                    🗑️ Eliminar
+                                                                </button>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 <?php endforeach; ?>
@@ -466,14 +468,14 @@ $estilosCategorias = [
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Categoría</th>
+                                    <th class="cell-nowrap">Categoría</th>
                                     <th>Producto</th>
-                                    <th class="text-center">Precio</th>
-                                    <th class="text-center">Stock Inicial</th>
-                                    <th class="text-center">Reservados</th>
-                                    <th class="text-center">Stock Disponible</th>
-                                    <th>Horario de Habilitación</th>
-                                    <th class="text-end pe-3">Total Recaudado</th>
+                                    <th class="text-center cell-nowrap">Precio</th>
+                                    <th class="text-center cell-nowrap">Stock Inicial</th>
+                                    <th class="text-center cell-nowrap">Reservados</th>
+                                    <th class="text-center cell-nowrap">Stock Disponible</th>
+                                    <th class="cell-nowrap">Horario de Habilitación</th>
+                                    <th class="text-end pe-3 cell-nowrap">Total Recaudado</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -490,7 +492,7 @@ $estilosCategorias = [
                                         $solicitados = (int) $item['cantidad_solicitada'];
                                         ?>
                                         <tr>
-                                            <td>
+                                            <td class="cell-nowrap">
                                                 <span class="badge bg-light text-dark border">
                                                     <?= $iconosCategorias[$item['categoria']] ?? '🍽️' ?> <?= htmlspecialchars($item['categoria']) ?>
                                                 </span>
@@ -498,32 +500,32 @@ $estilosCategorias = [
                                             <td class="fw-bold text-dark">
                                                 <?= htmlspecialchars($item['nombre']) ?>
                                             </td>
-                                            <td class="text-center">
+                                            <td class="text-center cell-nowrap">
                                                 Q <?= number_format((float) $item['precio'], 2) ?>
                                             </td>
-                                            <td class="text-center fw-bold">
+                                            <td class="text-center fw-bold cell-nowrap">
                                                 <?= (int) $item['stock'] ?>
                                             </td>
-                                            <td class="text-center">
+                                            <td class="text-center cell-nowrap">
                                                 <span class="badge bg-info text-dark">
                                                     <?= $solicitados ?>
                                                 </span>
                                             </td>
-                                            <td class="text-center">
+                                            <td class="text-center cell-nowrap">
                                                 <?php if ($stockDisp <= 0): ?>
                                                     <span class="badge bg-danger">Agotado (0)</span>
                                                 <?php else: ?>
                                                     <span class="badge bg-success"><?= $stockDisp ?> disponibles</span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="small text-muted">
+                                            <td class="small text-muted cell-nowrap">
                                                 <div><strong>Días:</strong> <?= htmlspecialchars($item['dias_habilitados'] ?: 'Todos') ?></div>
                                                 <div><strong>Horario:</strong> <?= substr((string)$item['hora_inicio'], 0, 5) ?> - <?= substr((string)$item['hora_fin'], 0, 5) ?></div>
                                                 <?php if (!empty($item['fecha_habilitacion'])): ?>
                                                     <div><strong>Fecha:</strong> <?= htmlspecialchars($item['fecha_habilitacion']) ?></div>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="text-end pe-3 fw-bold text-success">
+                                            <td class="text-end pe-3 fw-bold text-success cell-nowrap">
                                                 Q <?= number_format((float) $item['total_recaudado'], 2) ?>
                                             </td>
                                         </tr>
@@ -557,22 +559,22 @@ $estilosCategorias = [
                             <table class="table table-hover align-middle mb-0 small">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>#Reserva</th>
-                                        <th>Usuario / Comensal</th>
+                                        <th class="cell-nowrap">#Reserva</th>
+                                        <th style="min-width: 160px;">Usuario / Comensal</th>
                                         <th>Entrada</th>
                                         <th>Plato Fuerte</th>
                                         <th>Bebida</th>
                                         <th>Postre</th>
-                                        <th>Total</th>
-                                        <th>Modalidad</th>
-                                        <th>NIT</th>
-                                        <th>Fecha y Hora</th>
+                                        <th class="cell-nowrap">Total</th>
+                                        <th class="cell-nowrap">Modalidad</th>
+                                        <th class="cell-nowrap">NIT</th>
+                                        <th class="cell-nowrap">Fecha y Hora</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach ($reservasDetalladas as $rd): ?>
                                         <tr>
-                                            <td><strong>#<?= (int) $rd['id'] ?></strong></td>
+                                            <td class="cell-nowrap"><strong>#<?= (int) $rd['id'] ?></strong></td>
                                             <td>
                                                 <div class="fw-bold text-dark"><?= htmlspecialchars($rd['usuario_nombre'] ?? 'Usuario') ?></div>
                                                 <div class="text-muted"><?= htmlspecialchars($rd['usuario_email'] ?? '') ?></div>
@@ -584,10 +586,10 @@ $estilosCategorias = [
                                             <td><?= htmlspecialchars($rd['plato_fuerte_nombre'] ?? '—') ?></td>
                                             <td><?= htmlspecialchars($rd['bebida_nombre'] ?? '—') ?></td>
                                             <td><?= htmlspecialchars($rd['postre_nombre'] ?? '—') ?></td>
-                                            <td class="fw-bold text-success fs-6">Q <?= number_format((float) $rd['total'], 2) ?></td>
-                                            <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($rd['donde_consume']) ?></span></td>
-                                            <td><span class="badge bg-secondary-subtle text-dark"><?= htmlspecialchars($rd['nit_facturacion'] ?? 'C/F') ?></span></td>
-                                            <td class="text-muted"><?= htmlspecialchars($rd['fecha_reserva']) ?></td>
+                                            <td class="fw-bold text-success fs-6 cell-nowrap">Q <?= number_format((float) $rd['total'], 2) ?></td>
+                                            <td class="cell-nowrap"><span class="badge bg-light text-dark border"><?= htmlspecialchars($rd['donde_consume']) ?></span></td>
+                                            <td class="cell-nowrap"><span class="badge bg-secondary-subtle text-dark"><?= htmlspecialchars($rd['nit_facturacion'] ?? 'C/F') ?></span></td>
+                                            <td class="text-muted cell-nowrap"><?= htmlspecialchars($rd['fecha_reserva']) ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -609,7 +611,7 @@ $estilosCategorias = [
      MODAL — REALIZAR RESERVA DIRECTA (ADMINISTRADOR)
 ═══════════════════════════════════════════════════════ -->
 <div class="modal fade" id="modalReservaAdmin" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title fw-bold">🍽️ Realizar Reserva desde Administración</h5>

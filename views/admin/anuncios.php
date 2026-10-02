@@ -106,8 +106,8 @@ $semanaFinLocal = date('Y-m-d\T23:59', strtotime('+7 days'));
         <!-- ═══════════════════════════════════════════════════════
              COLUMNA LATERAL: FORMULARIO CREAR / EDITAR ANUNCIO
         ═══════════════════════════════════════════════════════ -->
-        <div class="col-lg-4 col-12 mb-4">
-            <div class="card shadow rounded-3 border-2 sticky-top" id="cardFormularioAnuncio" style="top: 20px; z-index: 10;">
+        <div class="col-xl-4 col-lg-5 col-12 mb-4">
+            <div class="card shadow rounded-3 border-2 sticky-panel-lg" id="cardFormularioAnuncio">
                 <div class="card-header text-white py-3" id="panelFormHeader"
                      style="background: linear-gradient(135deg, #15803d 0%, #16a34a 100%) !important;">
                     <h5 class="mb-0 fw-bold d-flex align-items-center justify-content-between flex-wrap gap-2">
@@ -211,7 +211,7 @@ $semanaFinLocal = date('Y-m-d\T23:59', strtotime('+7 days'));
         <!-- ═══════════════════════════════════════════════════════
              COLUMNA PRINCIPAL: TABLA DE ANUNCIOS
         ═══════════════════════════════════════════════════════ -->
-        <div class="col-lg-8 col-12">
+        <div class="col-xl-8 col-lg-7 col-12">
             <div class="card shadow rounded-3 mb-4 border-2">
                 <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2"
                      style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;">
@@ -235,11 +235,11 @@ $semanaFinLocal = date('Y-m-d\T23:59', strtotime('+7 days'));
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="table-light small">
                                     <tr>
-                                        <th style="width: 140px;">Estado</th>
+                                        <th class="cell-nowrap" style="width: 140px;">Estado</th>
                                         <th>Título y Mensaje</th>
-                                        <th style="width: 180px;">Vigencia</th>
-                                        <th class="text-center" style="width: 90px;">Activo</th>
-                                        <th class="text-center" style="width: 150px;">Acciones</th>
+                                        <th class="cell-nowrap" style="width: 180px;">Vigencia</th>
+                                        <th class="text-center cell-nowrap" style="width: 90px;">Activo</th>
+                                        <th class="text-center cell-nowrap" style="width: 160px;">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -253,7 +253,7 @@ $semanaFinLocal = date('Y-m-d\T23:59', strtotime('+7 days'));
                                         $esActivo = (bool)$a['activo'];
                                         ?>
                                         <tr id="fila-anuncio-<?= $id ?>" class="<?= ($estadoCalc === 'activo') ? 'table-success-subtle' : '' ?>">
-                                            <td>
+                                            <td class="cell-nowrap">
                                                 <span class="badge bg-<?= $badgeColor ?> shadow-sm d-inline-flex align-items-center gap-1" id="badge-estado-<?= $id ?>" style="font-size: 0.75rem;">
                                                     <span><?= $icono ?></span>
                                                     <span><?= htmlspecialchars($label) ?></span>
@@ -270,11 +270,11 @@ $semanaFinLocal = date('Y-m-d\T23:59', strtotime('+7 days'));
                                                     <?= nl2br(htmlspecialchars($a['mensaje'])) ?>
                                                 </div>
                                             </td>
-                                            <td class="small">
+                                            <td class="small cell-nowrap">
                                                 <div><strong>Inicio:</strong> <?= date('d/m/Y H:i', strtotime((string)$a['fecha_inicio'])) ?></div>
                                                 <div><strong>Fin:</strong> <?= date('d/m/Y H:i', strtotime((string)$a['fecha_fin'])) ?></div>
                                             </td>
-                                            <td class="text-center">
+                                            <td class="text-center cell-nowrap">
                                                 <div class="form-check form-switch d-inline-block">
                                                     <input class="form-check-input" type="checkbox" role="switch"
                                                            id="sw_anuncio_<?= $id ?>"
@@ -282,15 +282,17 @@ $semanaFinLocal = date('Y-m-d\T23:59', strtotime('+7 days'));
                                                            onchange="cambiarEstadoAnuncio(<?= $id ?>, this.checked, this)">
                                                 </div>
                                             </td>
-                                            <td class="text-center">
-                                                <button type="button" class="btn btn-sm btn-outline-primary fw-bold me-1"
-                                                        onclick="cargarAnuncioEnFormulario(<?= $id ?>)" title="Editar Anuncio">
-                                                    ✏️ Editar
-                                                </button>
-                                                <button type="button" class="btn btn-sm btn-outline-danger fw-bold"
-                                                        onclick="eliminarAnuncio(<?= $id ?>, '<?= htmlspecialchars($a['titulo'], ENT_QUOTES) ?>')" title="Eliminar Anuncio">
-                                                    🗑️ Borrar
-                                                </button>
+                                            <td class="text-center cell-nowrap">
+                                                <div class="btn-action-group justify-content-center">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary fw-bold"
+                                                            onclick="cargarAnuncioEnFormulario(<?= $id ?>)" title="Editar Anuncio">
+                                                        ✏️ Editar
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger fw-bold"
+                                                            onclick="eliminarAnuncio(<?= $id ?>, '<?= htmlspecialchars($a['titulo'], ENT_QUOTES) ?>')" title="Eliminar Anuncio">
+                                                        🗑️ Borrar
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>

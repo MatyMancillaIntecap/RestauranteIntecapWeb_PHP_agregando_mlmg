@@ -82,11 +82,11 @@ $estilosCategorias = [
         </div>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL: CATEGORÍAS (COL-LG-8) + RESUMEN STICKY (COL-LG-4) -->
+    <!-- CONTENIDO PRINCIPAL: CATEGORÍAS (COL-XL-8 COL-LG-7) + RESUMEN STICKY (COL-XL-4 COL-LG-5) -->
     <div class="row g-4">
 
         <!-- LISTADO DE LAS 4 CATEGORÍAS -->
-        <div class="col-lg-8 col-12">
+        <div class="col-xl-8 col-lg-7 col-12">
 
             <?php foreach ($categorias as $cat): ?>
                 <?php
@@ -226,8 +226,8 @@ $estilosCategorias = [
         </div>
 
         <!-- // RESUMEN DE SELECCIÓN Y CONFIRMACIÓN DE RESERVA CON ENCABEZADO VIBRANTE (STICKY) -->
-        <div class="col-lg-4 col-12">
-            <div class="card shadow rounded-3 sticky-top border-2" id="resumen-solicitud-card" style="top: 1.5rem; z-index: 10;">
+        <div class="col-xl-4 col-lg-5 col-12">
+            <div class="card shadow rounded-3 sticky-panel-lg border-2" id="resumen-solicitud-card">
                 <div class="card-header bg-primary text-white py-3" style="background: linear-gradient(135deg, #0a2540 0%, #123d6b 50%, #1e40af 100%) !important;">
                     <h5 class="mb-0 fw-bold d-flex align-items-center gap-2">
                         <span>🧾</span> Resumen de la Solicitud
@@ -318,12 +318,15 @@ $estilosCategorias = [
 
     </div>
 
+    <!-- Espaciador para evitar que la barra fija tape contenido en móvil -->
+    <div class="d-lg-none" style="height: 70px;"></div>
+
 </div>
 
 <!-- // BARRA FLOTANTE FIJA PARA DISPOSITIVOS MÓVILES CON COLORES FUERTES -->
 <div class="d-lg-none fixed-bottom shadow-lg p-2 px-3 d-flex justify-content-between align-items-center text-white"
      id="barra-movil-carta"
-     style="z-index: 1030; background: linear-gradient(135deg, #0a2540 0%, #123d6b 100%) !important; border-top: 2.5px solid #1e40af;">
+     style="z-index: 1030; background: linear-gradient(135deg, #0a2540 0%, #123d6b 100%) !important; border-top: 2.5px solid #1e40af; padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important;">
     <div>
         <small class="text-white-50 d-block fw-bold" style="font-size: 0.72rem; line-height: 1;">TOTAL ACUMULADO</small>
         <span class="fs-4 fw-bold text-warning" id="lbl-total-movil">Q 0.00</span>

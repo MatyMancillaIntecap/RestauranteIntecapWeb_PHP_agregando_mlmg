@@ -63,13 +63,13 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
-                            <th class="ps-3"># Reserva</th>
-                            <th>Fecha Consumo</th>
-                            <th>Platillo</th>
-                            <th class="text-center">Cantidad</th>
-                            <th class="text-end">Total Pagado</th>
-                            <th class="text-center">Forma Pago</th>
-                            <th class="text-center">NIT</th>
+                            <th class="ps-3 cell-nowrap"># Reserva</th>
+                            <th class="cell-nowrap">Fecha Consumo</th>
+                            <th style="min-width: 170px;">Platillo</th>
+                            <th class="text-center cell-nowrap">Cantidad</th>
+                            <th class="text-end cell-nowrap">Total Pagado</th>
+                            <th class="text-center cell-nowrap">Forma Pago</th>
+                            <th class="text-center cell-nowrap">NIT</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -77,12 +77,12 @@
                             <?php foreach ($historial as $item): ?>
                                 <tr>
                                     <!-- # RESERVA -->
-                                    <td class="ps-3 fw-bold text-primary">
+                                    <td class="ps-3 fw-bold text-primary cell-nowrap">
                                         #<?= (int)$item['reserva_id'] ?>
                                     </td>
 
                                     <!-- FECHA -->
-                                    <td>
+                                    <td class="cell-nowrap">
                                         <div class="fw-bold">
                                             <?= htmlspecialchars(date('d/m/Y', strtotime($item['fecha_consumo']))) ?>
                                         </div>
@@ -113,26 +113,26 @@
                                     </td>
 
                                     <!-- CANTIDAD -->
-                                    <td class="text-center">
+                                    <td class="text-center cell-nowrap">
                                         <span class="badge bg-primary fs-6 px-3">
                                             <?= (int)$item['cantidad'] ?>
                                         </span>
                                     </td>
 
                                     <!-- TOTAL PAGADO -->
-                                    <td class="text-end fw-bold text-success">
+                                    <td class="text-end fw-bold text-success cell-nowrap">
                                         Q <?= number_format((float)$item['cantidad'] * (float)$item['precio_unitario'], 2) ?>
                                     </td>
 
                                     <!-- FORMA PAGO -->
-                                    <td class="text-center">
+                                    <td class="text-center cell-nowrap">
                                         <span class="badge bg-info text-dark">
                                             <?= htmlspecialchars($item['forma_pago']) ?>
                                         </span>
                                     </td>
 
                                     <!-- NIT -->
-                                    <td class="text-center">
+                                    <td class="text-center cell-nowrap">
                                         <span class="badge bg-light text-dark border">
                                             <?= htmlspecialchars($item['nit_facturacion']) ?>
                                         </span>

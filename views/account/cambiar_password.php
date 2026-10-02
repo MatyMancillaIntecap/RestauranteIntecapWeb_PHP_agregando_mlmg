@@ -7,7 +7,7 @@
 ?>
 <div class="container-fluid px-3 px-sm-4">
     <div class="row justify-content-center">
-        <div class="col-lg-5 col-md-7 col-12">
+        <div class="col-xl-5 col-lg-6 col-md-8 col-12">
             <!-- // Tarjeta enmarcada con límites claros y cabecera institucional -->
             <div class="card shadow mt-4 mb-5 rounded-3 border-2" style="border: 2.5px solid #1e3a8a !important;">
                 <div class="card-header text-white py-3 text-center"
@@ -43,5 +43,4 @@
             </div>
         </div>
     </div>
-</div>
 </div>

@@ -17,38 +17,85 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        .navbar-custom        { background-color: #215ca8 !important; padding: .75rem 1rem; }
+        .navbar-custom        { background: linear-gradient(135deg, #0a2647 0%, #123d6b 50%, #1e40af 100%) !important; padding: .55rem 1rem; z-index: 1030; }
         .nav-btn              {
-            background-color: rgba(255,255,255,.15);
+            background-color: rgba(255,255,255,.14);
             color: #fff !important;
-            border: 1px solid rgba(255,255,255,.3);
-            border-radius: 20px;
-            padding: .45rem 1rem;
-            margin: .2rem .3rem;
+            border: 1px solid rgba(255,255,255,.28);
+            border-radius: 999px;
+            padding: .38rem .75rem;
+            margin: .15rem .2rem;
             font-weight: 600;
-            font-size: .9rem;
-            transition: all .25s ease-in-out;
+            font-size: .86rem;
+            white-space: nowrap;
+            transition: all .2s ease-in-out;
             display: inline-flex;
             align-items: center;
-            gap: .4rem;
+            gap: .35rem;
             text-decoration: none;
             position: relative;
         }
-        .nav-btn:hover        { background-color: #fff !important; color: #215ca8 !important; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,.2); }
-        .btn-logout           { background-color: #dc3545; color: #fff !important; border: none; border-radius: 20px; padding: .45rem 1.1rem; font-weight: 700; transition: all .25s ease-in-out; text-decoration: none; }
-        .btn-logout:hover     { background-color: #b02a37; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(220,53,69,.4); }
-        .user-badge           { background-color: rgba(0,0,0,.2); border-radius: 20px; padding: .4rem .9rem; border: 1px solid rgba(255,255,255,.2); font-size: .9rem; }
-        .navbar-badge         {
-            position: absolute;
-            top: -6px; right: -6px;
-            background: #dc3545;
-            color: #fff;
-            border-radius: 50%;
-            font-size: .65rem;
+        .nav-btn:hover        { background-color: #fff !important; color: #123d6b !important; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,.2); }
+        .btn-logout           {
+            background: linear-gradient(135deg, #dc3545, #b02a37);
+            color: #fff !important;
+            border: 1px solid rgba(255,255,255,.25);
+            border-radius: 999px;
+            padding: .38rem .9rem;
             font-weight: 700;
-            width: 18px; height: 18px;
-            display: flex; align-items: center; justify-content: center;
-            line-height: 1;
+            font-size: .86rem;
+            white-space: nowrap;
+            transition: all .2s ease-in-out;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+        }
+        .btn-logout:hover     { background: linear-gradient(135deg, #b02a37, #842029); transform: translateY(-1px); box-shadow: 0 4px 10px rgba(220,53,69,.4); }
+        .user-badge           {
+            background-color: rgba(0,0,0,.25);
+            border-radius: 999px;
+            padding: .38rem .85rem;
+            border: 1px solid rgba(255,255,255,.25);
+            font-size: .85rem;
+            white-space: nowrap;
+        }
+        .brand-text           { font-size: clamp(0.95rem, 1.8vw, 1.2rem); letter-spacing: -0.2px; }
+        @media (max-width: 1199.98px) {
+            #navbarContent {
+                background: rgba(10, 38, 71, 0.98);
+                border-radius: 12px;
+                padding: 1rem;
+                margin-top: .75rem;
+                border: 1px solid rgba(255,255,255,0.15);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            }
+            .nav-btn {
+                width: 100%;
+                justify-content: flex-start;
+                padding: .6rem 1rem;
+                margin: .2rem 0;
+                font-size: .92rem;
+            }
+            .navbar-user-actions {
+                width: 100%;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: .5rem !important;
+                border-top: 1px solid rgba(255,255,255,0.15);
+                padding-top: .75rem;
+                margin-top: .75rem;
+            }
+            .navbar-user-actions .user-badge {
+                justify-content: center;
+                width: 100%;
+                padding: .5rem;
+            }
+            .btn-logout {
+                width: 100%;
+                justify-content: center;
+                padding: .55rem 1rem;
+            }
         }
     </style>
     <!-- // Hoja de estilos del sistema con soporte responsivo y pestañas destacadas -->
@@ -56,21 +103,21 @@
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
 
-<header>
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom shadow">
-        <div class="container-fluid px-3">
+<header class="sticky-top">
+    <nav class="navbar navbar-expand-xl navbar-dark navbar-custom shadow">
+        <div class="container-fluid px-2 px-sm-3 px-lg-4">
             <a class="navbar-brand d-flex align-items-center fw-bold me-2 me-md-3"
                href="<?= BASE_URL ?>/account/login">
                 <span class="fs-4 me-2">🍳</span><span class="brand-text">Restaurante Intecap</span>
             </a>
-            <button class="navbar-toggler" type="button"
+            <button class="navbar-toggler border-0 p-2" type="button"
                     data-bs-toggle="collapse" data-bs-target="#navbarContent"
-                    aria-controls="navbarContent" aria-expanded="false">
+                    aria-controls="navbarContent" aria-expanded="false" aria-label="Alternar navegación">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navbarContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center">
+                <ul class="navbar-nav me-auto mb-2 mb-xl-0 align-items-xl-center">
                     <?php if (Auth::check()): ?>
 
                         <?php if (Auth::role() === 'Administrador'): ?>
@@ -158,7 +205,7 @@
                 </ul>
 
                 <?php if (Auth::check()): ?>
-                    <div class="navbar-user-actions d-flex align-items-center text-white gap-2 flex-wrap mt-2 mt-lg-0">
+                    <div class="navbar-user-actions d-flex align-items-center text-white gap-2 flex-wrap mt-2 mt-xl-0">
                         <div class="user-badge d-flex align-items-center me-1 flex-wrap gap-1">
                             <i class="bi bi-person-circle fs-5 me-1 text-warning"></i>
                             <span class="fw-bold"><?= htmlspecialchars(Auth::user()['nombre']) ?></span>

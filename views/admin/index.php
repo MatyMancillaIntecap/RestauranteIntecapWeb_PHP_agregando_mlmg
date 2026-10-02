@@ -28,7 +28,7 @@
     <div class="row g-3 g-md-4 mb-4">
 
         <!-- Platillos de Dieta (Azul Cyan Eléctrico) -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-3 col-md-6 col-12">
             <div class="card shadow rounded-3 p-3 h-100 text-white"
                  style="background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%); border: 2.5px solid #0369a1 !important;">
                 <div class="d-flex justify-content-between align-items-center">
@@ -39,7 +39,7 @@
                         </h3>
                         <small class="text-white-50 d-block mt-1 fw-semibold">Platillos solicitados hoy</small>
                     </div>
-                    <div class="fs-1 p-2 rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                    <div class="fs-1 p-2 rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0"
                          style="width: 58px; height: 58px; background: rgba(255, 255, 255, 0.25);">
                         🌿
                     </div>
@@ -48,7 +48,7 @@
         </div>
 
         <!-- Platillos Normales (Púrpura / Violeta Intenso) -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-3 col-md-6 col-12">
             <div class="card shadow rounded-3 p-3 h-100 text-white"
                  style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); border: 2.5px solid #6d28d9 !important;">
                 <div class="d-flex justify-content-between align-items-center">
@@ -59,7 +59,7 @@
                         </h3>
                         <small class="text-white-50 d-block mt-1 fw-semibold">Platillos solicitados hoy</small>
                     </div>
-                    <div class="fs-1 p-2 rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                    <div class="fs-1 p-2 rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0"
                          style="width: 58px; height: 58px; background: rgba(255, 255, 255, 0.25);">
                         🍛
                     </div>
@@ -68,7 +68,7 @@
         </div>
 
         <!-- Ventas de Hoy (Verde Esmeralda Brillante) -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-3 col-md-6 col-12">
             <div class="card shadow rounded-3 p-3 h-100 text-white"
                  style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border: 2.5px solid #047857 !important;">
                 <div class="d-flex justify-content-between align-items-center">
@@ -79,7 +79,7 @@
                         </h3>
                         <small class="text-white-50 d-block mt-1 fw-semibold">Ingresos recaudados hoy</small>
                     </div>
-                    <div class="fs-1 p-2 rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                    <div class="fs-1 p-2 rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0"
                          style="width: 58px; height: 58px; background: rgba(255, 255, 255, 0.25);">
                         💵
                     </div>
@@ -88,7 +88,7 @@
         </div>
 
         <!-- Reservas de Hoy (Rojo Rubí / Coral Intenso) -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-3 col-md-6 col-12">
             <div class="card shadow rounded-3 p-3 h-100 text-white"
                  style="background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%); border: 2.5px solid #be123c !important;">
                 <div class="d-flex justify-content-between align-items-center">
@@ -99,7 +99,7 @@
                         </h3>
                         <small class="text-white-50 d-block mt-1 fw-semibold">Total pedidos registrados</small>
                     </div>
-                    <div class="fs-1 p-2 rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                    <div class="fs-1 p-2 rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0"
                          style="width: 58px; height: 58px; background: rgba(255, 255, 255, 0.25);">
                         👥
                     </div>
@@ -112,7 +112,7 @@
     <!-- TARJETAS USUARIOS + LA CARTA + ANUNCIOS CON COLORES LLAMATIVOS -->
     <div class="row g-3 g-md-4 mb-4">
         <!-- Usuarios del Sistema (Azul Marino Oscuro Pizarra) -->
-        <div class="col-lg-4 col-md-6">
+        <div class="col-xl-4 col-md-6 col-12">
             <div class="card shadow rounded-3 p-3 h-100 text-white"
                  style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 2.5px solid #334155 !important;">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -123,14 +123,14 @@
                         </h5>
                         <small class="text-white-50">Roles y accesos al restaurante</small>
                     </div>
-                    <a href="<?= BASE_URL ?>/admin/usuarios" class="btn btn-warning text-dark fw-bold btn-sm shadow">
+                    <a href="<?= BASE_URL ?>/admin/usuarios" class="btn btn-warning text-dark fw-bold btn-sm shadow text-nowrap">
                         Ver Usuarios →
                     </a>
                 </div>
             </div>
         </div>
         <!-- Acceso directo a La Carta (Azul Zafiro Brillante) -->
-        <div class="col-lg-4 col-md-6">
+        <div class="col-xl-4 col-md-6 col-12">
             <div class="card shadow rounded-3 p-3 h-100 text-white"
                  style="background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%); border: 2.5px solid #1e40af !important;">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -139,14 +139,14 @@
                         <h5 class="fw-bold text-white mt-1 mb-0">Catálogo y Reservas</h5>
                         <small class="text-white-50">Entradas, platos, bebidas y postres</small>
                     </div>
-                    <a href="<?= BASE_URL ?>/carta/admin" class="btn btn-light text-primary fw-bold btn-sm shadow">
+                    <a href="<?= BASE_URL ?>/carta/admin" class="btn btn-light text-primary fw-bold btn-sm shadow text-nowrap">
                         Administrar →
                     </a>
                 </div>
             </div>
         </div>
         <!-- Acceso directo a Anuncios (Verde Esmeralda Brillante) -->
-        <div class="col-lg-4 col-md-12">
+        <div class="col-xl-4 col-md-12 col-12">
             <div class="card shadow rounded-3 p-3 h-100 text-white"
                  style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border: 2.5px solid #047857 !important;">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -155,7 +155,7 @@
                         <h5 class="fw-bold text-white mt-1 mb-0">Avisos Informativos</h5>
                         <small class="text-white-50">Gestiona alertas en la pantalla de inicio</small>
                     </div>
-                    <a href="<?= BASE_URL ?>/admin/anuncios" class="btn btn-light text-success fw-bold btn-sm shadow">
+                    <a href="<?= BASE_URL ?>/admin/anuncios" class="btn btn-light text-success fw-bold btn-sm shadow text-nowrap">
                         Gestionar →
                     </a>
                 </div>

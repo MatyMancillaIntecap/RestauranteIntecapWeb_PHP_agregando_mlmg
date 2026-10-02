@@ -18,14 +18,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <style>
         body {
-            margin: 0; padding: 0; height: 100vh;
+            margin: 0; padding: 1.5rem 1rem; min-height: 100vh; min-height: 100dvh;
             background-image: url('<?= BASE_URL ?>/images/logo_intecap/logo_fondo_intecap.png');
             background-size: cover; background-position: center; background-repeat: no-repeat;
+            background-attachment: fixed;
             display: flex; align-items: center; justify-content: center;
+            box-sizing: border-box;
         }
-        .login-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,.5); z-index: 1; }
-        .login-card-container { position: relative; z-index: 2; width: 100%; max-width: 420px; padding: 15px; }
-        .card-custom { background: rgba(255,255,255,.95); border-radius: 1rem; box-shadow: 0 1rem 3rem rgba(0,0,0,.3); }
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,.52); z-index: 1; }
+        .login-card-container { position: relative; z-index: 2; width: 100%; max-width: 440px; margin: auto; }
+        .card-custom { background: rgba(255,255,255,.96); border-radius: 1rem; box-shadow: 0 1rem 3rem rgba(0,0,0,.35); }
         .password-toggle {
             border-left: 0;
             background: #fff;

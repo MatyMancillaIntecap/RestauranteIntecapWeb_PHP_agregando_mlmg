@@ -111,15 +111,15 @@
                 <table class="table table-striped table-hover align-middle mb-0">
                     <thead class="table-dark">
                         <tr>
-                            <th>#</th>
-                            <th>Fecha consumo</th>
-                            <th>Platillo</th>
-                            <th>Cant.</th>
-                            <th>Precio unit.</th>
-                            <th>Total</th>
-                            <th>Forma pago</th>
-                            <th>NIT</th>
-                            <th>Estado</th>
+                            <th class="cell-nowrap">#</th>
+                            <th class="cell-nowrap">Fecha consumo</th>
+                            <th style="min-width: 170px;">Platillo</th>
+                            <th class="text-center cell-nowrap">Cant.</th>
+                            <th class="text-end cell-nowrap">Precio unit.</th>
+                            <th class="text-end cell-nowrap">Total</th>
+                            <th class="text-center cell-nowrap">Forma pago</th>
+                            <th class="text-center cell-nowrap">NIT</th>
+                            <th class="text-center cell-nowrap">Estado</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -132,17 +132,17 @@
                         <?php endif; ?>
                         <?php foreach ($detalle['historial_reservas'] as $r): ?>
                             <tr>
-                                <td><?= (int)$r['reserva_id'] ?></td>
-                                <td><?= htmlspecialchars($r['fecha_consumo']) ?></td>
+                                <td class="cell-nowrap"><?= (int)$r['reserva_id'] ?></td>
+                                <td class="cell-nowrap"><?= htmlspecialchars($r['fecha_consumo']) ?></td>
                                 <td class="fw-bold"><?= htmlspecialchars($r['nombre_plato']) ?></td>
-                                <td><?= (int)$r['cantidad'] ?></td>
-                                <td>Q <?= number_format((float)$r['precio_unitario'], 2) ?></td>
-                                <td class="fw-bold text-success">
+                                <td class="text-center cell-nowrap"><?= (int)$r['cantidad'] ?></td>
+                                <td class="text-end cell-nowrap">Q <?= number_format((float)$r['precio_unitario'], 2) ?></td>
+                                <td class="text-end fw-bold text-success cell-nowrap">
                                     Q <?= number_format((float)$r['cantidad'] * (float)$r['precio_unitario'], 2) ?>
                                 </td>
-                                <td><?= htmlspecialchars($r['forma_pago']) ?></td>
-                                <td><code><?= htmlspecialchars($r['nit_facturacion']) ?></code></td>
-                                <td>
+                                <td class="text-center cell-nowrap"><?= htmlspecialchars($r['forma_pago']) ?></td>
+                                <td class="text-center cell-nowrap"><code><?= htmlspecialchars($r['nit_facturacion']) ?></code></td>
+                                <td class="text-center cell-nowrap">
                                     <span class="badge bg-<?= $r['estado'] === 'Activa' ? 'success' : 'secondary' ?>">
                                         <?= htmlspecialchars($r['estado']) ?>
                                     </span>

@@ -84,8 +84,8 @@
             <div class="row">
 
                 <!-- Formulario lateral de NUEVO PLATILLO CON ENCABEZADO CÁLIDO VIBRANTE -->
-                <div class="col-lg-4 col-12 mb-4">
-                    <div class="card shadow rounded-3 border-2">
+                <div class="col-xl-4 col-lg-5 col-12 mb-4">
+                    <div class="card shadow rounded-3 border-2 sticky-panel-lg">
                         <div class="card-header text-white" style="background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;">
                             <h5 class="mb-0 fw-bold">➕ Publicar Opción del Día</h5>
                         </div>
@@ -150,7 +150,7 @@
                 </div>
 
                 <!-- Tabla de platillos registrados -->
-                <div class="col-lg-8 col-12">
+                <div class="col-xl-8 col-lg-7 col-12">
                     <div class="card shadow rounded-3 border-2">
                         <div class="card-header text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;">
                             <h5 class="mb-0 fw-bold">📋 Platillos Registrados</h5>
@@ -160,12 +160,12 @@
                                 <table class="table table-hover align-middle mb-0">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="ps-3">Imagen</th>
+                                            <th class="ps-3 cell-nowrap">Imagen</th>
                                             <th>Platillo</th>
-                                            <th>Precio</th>
-                                            <th>Hora de habilitación</th>
-                                            <th>Stock (Disp / Total)</th>
-                                            <th>Acciones</th>
+                                            <th class="cell-nowrap">Precio</th>
+                                            <th class="cell-nowrap">Hora de habilitación</th>
+                                            <th class="cell-nowrap">Stock (Disp / Total)</th>
+                                            <th class="text-center cell-nowrap" style="min-width: 220px;">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -178,7 +178,7 @@
                                         <?php endif; ?>
                                         <?php foreach ($menus as $m): ?>
                                             <tr>
-                                                <td class="ps-3">
+                                                <td class="ps-3 cell-nowrap">
                                                     <?php if (!empty($m['imagen_url'])): ?>
                                                         <img src="<?= resolve_image_url($m['imagen_url']) ?>"
                                                              class="rounded"
@@ -209,41 +209,43 @@
                                                         </span>
                                                     <?php endif; ?>
                                                 </td>
-                                                <td class="text-success fw-bold">
+                                                <td class="text-success fw-bold cell-nowrap">
                                                     Q <?= number_format((float)$m['precio'], 2) ?>
                                                 </td>
-                                                <td>
+                                                <td class="cell-nowrap">
                                                     <?= htmlspecialchars(date('d/m/Y H:i', strtotime((string)$m['hora_habilitacion']))) ?>
                                                 </td>
-                                                <td>
+                                                <td class="cell-nowrap">
                                                     <span class="badge bg-primary px-2 py-1">
                                                         <?= (int)$m['stock'] ?> / <?= (int)$m['stock'] + (int)$m['cantidad_solicitada'] ?>
                                                     </span>
                                                 </td>
-                                                <td class="text-nowrap">
-                                                    <button class="btn btn-sm btn-outline-primary fw-bold me-1"
-                                                            onclick="abrirModalEditar(<?= (int)$m['id'] ?>)"
-                                                            title="Editar Platillo">
-                                                        ✏️ Editar
-                                                    </button>
-                                                    <?php if ($m['estado'] === 'Disponible'): ?>
-                                                        <button class="btn btn-sm btn-outline-warning fw-bold me-1"
-                                                                onclick="cambiarEstadoPlatillo(<?= (int)$m['id'] ?>, 'Inactivo')"
-                                                                title="Deshabilitar Platillo">
-                                                            🚫 Pausar
+                                                <td class="text-center cell-nowrap">
+                                                    <div class="btn-action-group justify-content-center">
+                                                        <button class="btn btn-sm btn-outline-primary fw-bold"
+                                                                onclick="abrirModalEditar(<?= (int)$m['id'] ?>)"
+                                                                title="Editar Platillo">
+                                                            ✏️ Editar
                                                         </button>
-                                                    <?php else: ?>
-                                                        <button class="btn btn-sm btn-outline-success fw-bold me-1"
-                                                                onclick="cambiarEstadoPlatillo(<?= (int)$m['id'] ?>, 'Disponible')"
-                                                                title="Habilitar Platillo">
-                                                            ✅ Activar
+                                                        <?php if ($m['estado'] === 'Disponible'): ?>
+                                                            <button class="btn btn-sm btn-outline-warning fw-bold"
+                                                                    onclick="cambiarEstadoPlatillo(<?= (int)$m['id'] ?>, 'Inactivo')"
+                                                                    title="Deshabilitar Platillo">
+                                                                🚫 Pausar
+                                                            </button>
+                                                        <?php else: ?>
+                                                            <button class="btn btn-sm btn-outline-success fw-bold"
+                                                                    onclick="cambiarEstadoPlatillo(<?= (int)$m['id'] ?>, 'Disponible')"
+                                                                    title="Habilitar Platillo">
+                                                                ✅ Activar
+                                                            </button>
+                                                        <?php endif; ?>
+                                                        <button class="btn btn-sm btn-outline-danger fw-bold"
+                                                                onclick="eliminarMenu(<?= (int)$m['id'] ?>)"
+                                                                title="Eliminar Platillo">
+                                                            🗑️ Borrar
                                                         </button>
-                                                    <?php endif; ?>
-                                                    <button class="btn btn-sm btn-outline-danger fw-bold"
-                                                            onclick="eliminarMenu(<?= (int)$m['id'] ?>)"
-                                                            title="Eliminar Platillo">
-                                                        🗑️ Borrar
-                                                    </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -333,14 +335,14 @@
                         <table class="table table-striped align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>#</th>
-                                    <th>Empleado</th>
+                                    <th class="cell-nowrap">#</th>
+                                    <th style="min-width: 170px;">Empleado</th>
                                     <th>Plato Elegido</th>
-                                    <th>Cantidad</th>
-                                    <th>¿Dónde Consume?</th>
-                                    <th>Forma de Pago</th>
-                                    <th>Hora Reserva</th>
-                                    <th>Estado Platillo</th>
+                                    <th class="text-center cell-nowrap">Cantidad</th>
+                                    <th class="cell-nowrap">¿Dónde Consume?</th>
+                                    <th class="cell-nowrap">Forma de Pago</th>
+                                    <th class="cell-nowrap">Hora Reserva</th>
+                                    <th class="cell-nowrap">Estado Platillo</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -348,7 +350,7 @@
                                     <?php $correlativo = 1; ?>
                                     <?php foreach ($reservas_detalle as $r): ?>
                                         <tr>
-                                            <td><?= $correlativo++ ?></td>
+                                            <td class="cell-nowrap"><?= $correlativo++ ?></td>
                                             <td>
                                                 <div class="fw-bold"><?= htmlspecialchars($r['nombre_empleado']) ?></div>
                                                 <small class="text-muted d-block"><?= htmlspecialchars($r['email_empleado']) ?></small>
@@ -361,11 +363,11 @@
                                                     <?= htmlspecialchars($r['nombre_plato']) ?>
                                                 </span>
                                             </td>
-                                            <td><span class="badge bg-primary fs-6"><?= (int)$r['cantidad'] ?></span></td>
-                                            <td><span class="badge bg-info text-dark"><?= htmlspecialchars($r['donde_consume']) ?></span></td>
-                                            <td><span class="badge bg-success"><?= htmlspecialchars($r['forma_pago']) ?></span></td>
-                                            <td><?= htmlspecialchars(substr($r['fecha_reserva'], 11, 8)) ?></td>
-                                            <td>
+                                            <td class="text-center cell-nowrap"><span class="badge bg-primary fs-6"><?= (int)$r['cantidad'] ?></span></td>
+                                            <td class="cell-nowrap"><span class="badge bg-info text-dark"><?= htmlspecialchars($r['donde_consume']) ?></span></td>
+                                            <td class="cell-nowrap"><span class="badge bg-success"><?= htmlspecialchars($r['forma_pago']) ?></span></td>
+                                            <td class="cell-nowrap"><?= htmlspecialchars(substr($r['fecha_reserva'], 11, 8)) ?></td>
+                                            <td class="cell-nowrap">
                                                 <?php if ($r['estado_platillo'] === 'Disponible'): ?>
                                                     <span class="badge bg-success">✅ Disponible</span>
                                                 <?php elseif ($r['estado_platillo'] === 'Inactivo'): ?>
@@ -399,7 +401,7 @@
      MODAL — EDITAR PLATILLO EXISTENTE
 ═══════════════════════════════════════════════════════ -->
 <div class="modal fade" id="modalEditarMenu" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title fw-bold">✏️ Editar Platillo</h5>

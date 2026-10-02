@@ -37,7 +37,7 @@
 
         <!-- Cada tarjeta expone los datos que el carrito necesita para el POST JSON. -->
         <!-- LISTA DE PLATILLOS -->
-        <div class="col-lg-8 col-12 mb-4">
+        <div class="col-xl-8 col-lg-7 col-12 mb-4">
             <div class="row">
                 <?php if (empty($menus)): ?>
                     <div class="col-12">
@@ -48,7 +48,7 @@
                 <?php endif; ?>
 
                 <?php foreach ($menus as $m): ?>
-                    <div class="col-md-6 col-12 mb-4">
+                    <div class="col-12 col-md-6 mb-4">
                         <div class="card h-100 shadow-sm rounded-3 overflow-hidden">
                             <?php if (!empty($m['imagen_url'])): ?>
                                 <img src="<?= resolve_image_url($m['imagen_url']) ?>"
@@ -126,8 +126,8 @@
         </div>
 
         <!-- PANEL LATERAL: CARRITO ENMARCADO -->
-        <div class="col-lg-4 col-12">
-            <div class="card shadow rounded-3 sticky-top border-2" style="top:20px;">
+        <div class="col-xl-4 col-lg-5 col-12">
+            <div class="card shadow rounded-3 sticky-panel-lg border-2">
                 <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #0a2540 0%, #123d6b 50%, #1e40af 100%) !important;">
                     <h5 class="mb-0 fw-bold d-flex justify-content-between align-items-center">
                         <span>🛍️ Mi Solicitud</span>
@@ -166,10 +166,13 @@
             </div>
         </div>
     </div>
+
+    <!-- Espaciador para evitar solapamiento con la barra móvil -->
+    <div class="d-lg-none" style="height: 70px;"></div>
 </div>
 
 <!-- BARRA FLOTANTE MÓVIL DEL CARRITO (Sólo visible en móviles cuando hay platillos seleccionados) -->
-<div id="barraMovilEmpleado" class="fixed-bottom bg-white border-top shadow-lg p-2 d-lg-none d-none" style="z-index: 1040;">
+<div id="barraMovilEmpleado" class="fixed-bottom bg-white border-top shadow-lg p-2 d-lg-none d-none" style="z-index: 1040; padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important;">
     <div class="container-fluid d-flex justify-content-between align-items-center gap-2">
         <div>
             <div class="small text-muted"><span id="cantMovil">0</span> platillo(s) en orden</div>

@@ -973,3 +973,120 @@ code {
         min-height: 40px;
     }
 }
+
+/* ============================================================
+   SISTEMA RESPONSIVO MULTIPLATAFORMA INTEGRADO
+   Garantiza que todas las pantallas y módulos se visualicen ordenados
+   y completos sin importar resolución, zoom o tipo de dispositivo.
+   ============================================================ */
+
+/* Paneles laterales inteligentes: sticky sólo en pantallas grandes */
+@media (min-width: 992px) {
+    .sticky-panel-lg {
+        position: sticky !important;
+        top: 1.25rem !important;
+        z-index: 10 !important;
+    }
+}
+@media (max-width: 991.98px) {
+    .sticky-panel-lg {
+        position: static !important;
+        top: auto !important;
+    }
+}
+
+/* Grupos de botones de acción en tablas: nunca se parten ni escalonan */
+.btn-action-group {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+}
+
+.btn-action-group .btn {
+    white-space: nowrap !important;
+    padding: 0.28rem 0.6rem !important;
+    font-size: 0.82rem !important;
+}
+
+/* Celdas que nunca deben partirse en múltiples líneas (fechas, precios, IDs) */
+.cell-nowrap {
+    white-space: nowrap !important;
+}
+
+/* Truncamiento limpio de textos largos para no deformar tablas ni tarjetas */
+.text-truncate-2 {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    word-break: break-word !important;
+}
+
+.text-truncate-3 {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    word-break: break-word !important;
+}
+
+/* Scrollbars personalizados suaves para tablas con desbordamiento */
+.table-responsive::-webkit-scrollbar {
+    height: 7px;
+}
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Encabezados y tarjetas con botones adaptables */
+.card-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* Modales centrados y scrolleables por defecto */
+.modal-dialog {
+    max-width: min(92vw, 580px);
+    margin: 1.75rem auto;
+}
+
+.modal-dialog.modal-lg {
+    max-width: min(94vw, 850px);
+}
+
+.modal-dialog.modal-xl {
+    max-width: min(96vw, 1100px);
+}
+
+.modal-content {
+    border-radius: var(--intecap-radius) !important;
+    border: 1.5px solid var(--intecap-border) !important;
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.25) !important;
+    overflow: hidden;
+}
+
+/* Adaptabilidad para pantallas de computadoras portátiles (1200px a 1400px o zoom 125%) */
+@media (min-width: 992px) and (max-width: 1399.98px) {
+    .table thead th, .table tbody td {
+        padding: 0.65rem 0.75rem !important;
+        font-size: 0.84rem !important;
+    }
+    .card-body {
+        padding: 1.15rem !important;
+    }
+}
