@@ -124,3 +124,23 @@ INSERT INTO formas_pago (nombre) VALUES ('Efectivo'), ('Carnet');
 
 -- El usuario administrador inicial se crea ejecutando: php database/seed_admin.php
 -- (el hash de contraseña debe generarse con password_hash() de PHP, no puede escribirse a mano en SQL)
+
+-- Tabla de Anuncios y Avisos Informativos (Login y Pantalla de Inicio)
+CREATE TABLE IF NOT EXISTS anuncios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(150) NOT NULL,
+    tipo VARCHAR(100) NOT NULL DEFAULT 'Personalizar',
+    mensaje TEXT NOT NULL,
+    fecha_inicio DATETIME NOT NULL,
+    fecha_fin DATETIME NOT NULL,
+    activo TINYINT(1) NOT NULL DEFAULT 1,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO anuncios (titulo, tipo, mensaje, fecha_inicio, fecha_fin, activo) VALUES
+    ('Servicio a La Carta', 'Esta semana servicio a la carta, reserva martes a las 11:00 A.M.', 'Esta semana servicio a la carta, reserva martes a las 11:00 A.M.', NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY), 1),
+    ('Aviso de Desayuno', 'Hoy no hay servicio de desayuno', 'Hoy no hay servicio de desayuno', NOW(), DATE_ADD(CURDATE(), INTERVAL '23:59:59' HOUR_SECOND), 0),
+    ('Aviso de Almuerzo', 'Hoy no hay servicio de almuerzo', 'Hoy no hay servicio de almuerzo', NOW(), DATE_ADD(CURDATE(), INTERVAL '23:59:59' HOUR_SECOND), 0),
+    ('Aviso de Café/Escuela', 'Hoy no hay servicio de café/escuela', 'Hoy no hay servicio de café/escuela', NOW(), DATE_ADD(CURDATE(), INTERVAL '23:59:59' HOUR_SECOND), 0);
+

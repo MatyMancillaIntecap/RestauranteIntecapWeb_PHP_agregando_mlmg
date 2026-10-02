@@ -80,10 +80,6 @@ $estilosCategorias = [
                     <button type="button" class="btn btn-warning text-dark fw-bold shadow-sm flex-fill flex-md-grow-0 text-center" onclick="abrirModalReservaAdmin()">
                         🍽️ Realizar Reserva
                     </button>
-                    <!-- Botón para nuevo producto -->
-                    <button type="button" class="btn btn-success fw-bold shadow-sm flex-fill flex-md-grow-0 text-center" onclick="abrirModalNuevoProducto()">
-                        ➕ Nuevo Producto
-                    </button>
                 </div>
             </div>
         </div>
@@ -111,45 +107,173 @@ $estilosCategorias = [
              PESTAÑA 1: CATÁLOGO GENERAL (TODAS LAS CATEGORÍAS)
         ═══════════════════════════════════════════════════════ -->
         <div class="tab-pane fade <?= ($tabActiva !== 'consolidado') ? 'show active' : '' ?>" id="tab-catalogo" role="tabpanel">
-            <div class="card shadow rounded-3 mb-4 border-2">
-                <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center"
-                     style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;">
-                    <h5 class="mb-0 fw-bold d-flex align-items-center gap-2">
-                        <span>🍽️</span> Catálogo General de La Carta (Todas las Categorías)
-                    </h5>
-                    <span class="badge bg-warning text-dark fw-bold shadow-sm">
-                        <?= count($categorias) ?> Categorías
-                    </span>
+            <div class="row">
+
+                <!-- Formulario lateral de NUEVO PRODUCTO / EDITAR PRODUCTO (AL LADO COMO EN COCINA) -->
+                <div class="col-lg-4 col-12 mb-4">
+                    <div class="card shadow rounded-3 border-2 sticky-top" id="cardFormularioLateral" style="top: 20px; z-index: 10;">
+                        <div class="card-header text-white py-3" id="panelFormHeader"
+                             style="background: linear-gradient(135deg, #15803d 0%, #16a34a 100%) !important;">
+                            <h5 class="mb-0 fw-bold d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <span id="panelFormTitulo">➕ Registrar Producto</span>
+                                <span class="badge bg-white text-success small shadow-sm" id="badgeModoForm">Nuevo</span>
+                            </h5>
+                        </div>
+                        <div class="card-body p-3 p-md-4">
+                            <form method="post" action="<?= BASE_URL ?>/carta/guardar" enctype="multipart/form-data" id="formProductoLateral">
+                                <input type="hidden" id="prod_id" name="id" value="0">
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Categoría <span class="text-danger">*</span></label>
+                                    <select id="prod_categoria" name="categoria" class="form-select form-select-sm" required>
+                                        <option value="">-- Selecciona una categoría --</option>
+                                        <?php foreach ($categorias as $c): ?>
+                                            <option value="<?= htmlspecialchars($c) ?>">
+                                                <?= $iconosCategorias[$c] ?? '' ?> <?= htmlspecialchars($c) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Nombre del Producto <span class="text-danger">*</span></label>
+                                    <input type="text" id="prod_nombre" name="nombre" class="form-control form-control-sm"
+                                           placeholder="Ej. Ensalada César, Pollo a la Plancha..." required maxlength="100">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Descripción</label>
+                                    <textarea id="prod_descripcion" name="descripcion" class="form-control form-control-sm" rows="2"
+                                              placeholder="Detalles sobre ingredientes, preparación o porción..."></textarea>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <label class="form-label fw-bold small">Precio (Q) <span class="text-danger">*</span></label>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text fw-bold">Q</span>
+                                            <input type="number" id="prod_precio" name="precio" class="form-control form-control-sm"
+                                                   step="0.01" min="0.01" placeholder="0.00" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6 mb-3">
+                                        <label class="form-label fw-bold small">Stock Inicial <span class="text-danger">*</span></label>
+                                        <input type="number" id="prod_stock" name="stock" class="form-control form-control-sm"
+                                               min="0" max="9999" value="10" required>
+                                    </div>
+                                </div>
+
+                                <!-- CONTROL DE HABILITACIÓN Y HORARIOS -->
+                                <div class="card border p-3 mb-3 bg-light rounded-3">
+                                    <h6 class="fw-bold text-dark small mb-2 d-flex align-items-center gap-1">
+                                        <span>⏰</span> Días y Horarios de Habilitación
+                                    </h6>
+
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-bold mb-1">Días habilitados</label>
+                                        <select id="prod_dias_habilitados" name="dias_habilitados" class="form-select form-select-sm">
+                                            <option value="Todos">Todos los días</option>
+                                            <option value="Lunes">Solo Lunes</option>
+                                            <option value="Martes">Solo Martes</option>
+                                            <option value="Miércoles">Solo Miércoles</option>
+                                            <option value="Jueves">Solo Jueves</option>
+                                            <option value="Viernes">Solo Viernes</option>
+                                            <option value="Sábado">Solo Sábado</option>
+                                            <option value="Domingo">Solo Domingo</option>
+                                            <option value="Lunes,Martes,Miércoles,Jueves,Viernes">De Lunes a Viernes</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-bold mb-1">Fecha específica (Opcional)</label>
+                                        <input type="date" id="prod_fecha_habilitacion" name="fecha_habilitacion" class="form-control form-control-sm">
+                                        <small class="text-muted" style="font-size: 0.72rem;">Vacío para aplicar siempre.</small>
+                                    </div>
+
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <label class="form-label small fw-bold mb-1">Apertura</label>
+                                            <input type="time" id="prod_hora_inicio" name="hora_inicio" class="form-control form-control-sm" value="00:00">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label small fw-bold mb-1">Cierre</label>
+                                            <input type="time" id="prod_hora_fin" name="hora_fin" class="form-control form-control-sm" value="23:59">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Imagen -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Fotografía / Imagen (Opcional)</label>
+                                    <input type="file" id="prod_imagen_file" name="imagen_file" class="form-control form-control-sm"
+                                           accept="image/jpeg,image/png,image/gif,image/webp,image/avif">
+                                    <div id="preview_imagen_actual" class="mt-2 d-none">
+                                        <span class="small text-muted d-block mb-1">Imagen actual:</span>
+                                        <img src="" id="img_preview" class="rounded border" style="max-height: 70px;">
+                                    </div>
+                                </div>
+
+                                <!-- Estado Activo -->
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="prod_estado" name="estado" value="1" checked>
+                                    <label class="form-check-label fw-bold small" for="prod_estado">
+                                        Producto Activo en el Catálogo
+                                    </label>
+                                </div>
+
+                                <button type="submit" class="btn btn-success w-100 fw-bold py-2 shadow-sm" id="btnGuardar">
+                                    💾 Guardar Producto
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary w-100 fw-bold mt-2 d-none" id="btnCancelarEdicion" onclick="cancelarEdicionProducto()">
+                                    ✖️ Cancelar Edición
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="card-body p-4">
-                    <?php foreach ($categorias as $cat): ?>
-                        <?php
-                        $catKey = strtolower(str_replace(' ', '_', $cat));
-                        $productos = $productosPorCategoria[$cat] ?? [];
-                        $icono = $iconosCategorias[$cat] ?? '🍽️';
-                        $estilo = $estilosCategorias[$cat] ?? [
-                            'bg_gradient' => 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)',
-                            'border' => '#1d4ed8',
-                            'bg_card' => '#ffffff',
-                            'badge' => '#1e40af',
-                            'btn_class' => 'btn-light text-dark'
-                        ];
-                        ?>
+                <!-- Catálogo general de categorías -->
+                <div class="col-lg-8 col-12">
+                    <div class="card shadow rounded-3 mb-4 border-2">
+                        <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center"
+                             style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;">
+                            <h5 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                                <span>🍽️</span> Catálogo General de La Carta (Todas las Categorías)
+                            </h5>
+                            <span class="badge bg-warning text-dark fw-bold shadow-sm">
+                                <?= count($categorias) ?> Categorías
+                            </span>
+                        </div>
 
-                        <!-- // TARJETA DE CATEGORÍA CON COLOR LLAMATIVO Y ENCABEZADO VIBRANTE -->
-                        <div class="card mb-4 rounded-3 shadow" style="border: 2.5px solid <?= $estilo['border'] ?> !important; background: <?= $estilo['bg_card'] ?>;">
-                            <div class="card-header text-white py-3 d-flex justify-content-between align-items-center shadow-sm flex-wrap gap-2"
-                                 style="background: <?= $estilo['bg_gradient'] ?> !important;">
-                                <div class="d-flex align-items-center gap-2 flex-wrap">
-                                    <span class="fs-4"><?= $icono ?></span>
-                                    <h5 class="mb-0 fw-bold text-white text-uppercase" style="letter-spacing: 0.5px;"><?= htmlspecialchars($cat) ?></h5>
-                                    <span class="badge bg-white text-dark ms-2 fw-bold shadow-sm"><?= count($productos) ?> producto<?= count($productos) !== 1 ? 's' : '' ?></span>
-                                </div>
-                                <button type="button" class="btn btn-sm btn-light text-dark fw-bold shadow-sm" onclick="abrirModalNuevoProducto('<?= htmlspecialchars($cat, ENT_QUOTES) ?>')">
-                                    ➕ Agregar a <?= htmlspecialchars($cat) ?>
-                                </button>
-                            </div>
+                        <div class="card-body p-3 p-md-4">
+                            <?php foreach ($categorias as $cat): ?>
+                                <?php
+                                $catKey = strtolower(str_replace(' ', '_', $cat));
+                                $productos = $productosPorCategoria[$cat] ?? [];
+                                $icono = $iconosCategorias[$cat] ?? '🍽️';
+                                $estilo = $estilosCategorias[$cat] ?? [
+                                    'bg_gradient' => 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)',
+                                    'border' => '#1d4ed8',
+                                    'bg_card' => '#ffffff',
+                                    'badge' => '#1e40af',
+                                    'btn_class' => 'btn-light text-dark'
+                                ];
+                                ?>
+
+                                <!-- // TARJETA DE CATEGORÍA CON COLOR LLAMATIVO Y ENCABEZADO VIBRANTE -->
+                                <div class="card mb-4 rounded-3 shadow" style="border: 2.5px solid <?= $estilo['border'] ?> !important; background: <?= $estilo['bg_card'] ?>;">
+                                    <div class="card-header text-white py-3 d-flex justify-content-between align-items-center shadow-sm flex-wrap gap-2"
+                                         style="background: <?= $estilo['bg_gradient'] ?> !important;">
+                                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="fs-4"><?= $icono ?></span>
+                                            <h5 class="mb-0 fw-bold text-white text-uppercase" style="letter-spacing: 0.5px;"><?= htmlspecialchars($cat) ?></h5>
+                                            <span class="badge bg-white text-dark ms-2 fw-bold shadow-sm"><?= count($productos) ?> producto<?= count($productos) !== 1 ? 's' : '' ?></span>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-light text-dark fw-bold shadow-sm" onclick="seleccionarCategoriaEnFormulario('<?= htmlspecialchars($cat, ENT_QUOTES) ?>')">
+                                            ➕ Agregar a <?= htmlspecialchars($cat) ?>
+                                        </button>
+                                    </div>
 
                             <div class="card-body p-0">
                                 <?php if (empty($productos)): ?>
@@ -266,7 +390,9 @@ $estilosCategorias = [
                     <?php endforeach; ?>
                 </div>
             </div>
-        </div>
+        </div><!-- /col-lg-8 -->
+    </div><!-- /row -->
+</div><!-- /tab-catalogo -->
 
         <!-- ═══════════════════════════════════════════════════════
              PESTAÑA 2: RECUENTO CONSOLIDADO DE RESERVAS Y EXPORTACIONES
@@ -477,146 +603,7 @@ $estilosCategorias = [
 
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     MODAL — CREAR / EDITAR PRODUCTO (CON HORARIOS Y STOCK)
-═══════════════════════════════════════════════════════ -->
-<div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title fw-bold" id="modalTitulo">➕ Nuevo Producto para La Carta</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="post" action="<?= BASE_URL ?>/carta/guardar" enctype="multipart/form-data">
-                <div class="modal-body">
-                    <input type="hidden" id="prod_id" name="id" value="0">
 
-                    <div class="row">
-                        <!-- Categoría -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Categoría <span class="text-danger">*</span></label>
-                            <select id="prod_categoria" name="categoria" class="form-select" required>
-                                <option value="">-- Selecciona una categoría --</option>
-                                <?php foreach ($categorias as $c): ?>
-                                    <option value="<?= htmlspecialchars($c) ?>">
-                                        <?= $iconosCategorias[$c] ?? '' ?> <?= htmlspecialchars($c) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <!-- Nombre -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Nombre del Producto <span class="text-danger">*</span></label>
-                            <input type="text" id="prod_nombre" name="nombre" class="form-control"
-                                   placeholder="Ej. Ensalada César, Pollo a la Plancha..." required maxlength="100">
-                        </div>
-                    </div>
-
-                    <!-- Descripción -->
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Descripción</label>
-                        <textarea id="prod_descripcion" name="descripcion" class="form-control" rows="2"
-                                  placeholder="Detalles sobre ingredientes, preparación o porción..."></textarea>
-                    </div>
-
-                    <div class="row">
-                        <!-- Precio -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Precio (Quetzales) <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <span class="input-group-text fw-bold">Q</span>
-                                <input type="number" id="prod_precio" name="precio" class="form-control"
-                                       step="0.01" min="0.01" placeholder="0.00" required>
-                            </div>
-                        </div>
-
-                        <!-- Stock inicial -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Stock Disponible <span class="text-danger">*</span></label>
-                            <input type="number" id="prod_stock" name="stock" class="form-control"
-                                   min="0" max="9999" value="10" required>
-                            <small class="text-muted">Unidades disponibles para los comensales.</small>
-                        </div>
-                    </div>
-
-                    <!-- ── CONTROL DE HABILITACIÓN Y HORARIOS ── -->
-                    <div class="card border p-3 mb-3 bg-light rounded-3">
-                        <h6 class="fw-bold text-dark mb-2">⏰ Control de Habilitación y Horarios</h6>
-                        <p class="text-muted small mb-3">
-                            Configura los días, fechas y horas en las que el producto estará disponible para los usuarios. Fuera de ese horario no aparecerá.
-                        </p>
-
-                        <div class="row">
-                            <!-- Días habilitados -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label small fw-bold">Días habilitados</label>
-                                <select id="prod_dias_habilitados" name="dias_habilitados" class="form-select form-select-sm">
-                                    <option value="Todos">Todos los días</option>
-                                    <option value="Lunes">Solo Lunes</option>
-                                    <option value="Martes">Solo Martes</option>
-                                    <option value="Miércoles">Solo Miércoles</option>
-                                    <option value="Jueves">Solo Jueves</option>
-                                    <option value="Viernes">Solo Viernes</option>
-                                    <option value="Sábado">Solo Sábado</option>
-                                    <option value="Domingo">Solo Domingo</option>
-                                    <option value="Lunes,Martes,Miércoles,Jueves,Viernes">De Lunes a Viernes</option>
-                                </select>
-                            </div>
-
-                            <!-- Fecha específica (opcional) -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label small fw-bold">Fecha específica (Opcional)</label>
-                                <input type="date" id="prod_fecha_habilitacion" name="fecha_habilitacion" class="form-control form-control-sm">
-                                <small class="text-muted">Dejar vacío si aplica todas las semanas.</small>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <!-- Hora inicio -->
-                            <div class="col-md-6 mb-2">
-                                <label class="form-label small fw-bold">Hora de apertura / inicio</label>
-                                <input type="time" id="prod_hora_inicio" name="hora_inicio" class="form-control form-control-sm" value="00:00">
-                                <small class="text-muted">Ejemplo: 08:00 AM</small>
-                            </div>
-
-                            <!-- Hora fin -->
-                            <div class="col-md-6 mb-2">
-                                <label class="form-label small fw-bold">Hora de cierre / fin</label>
-                                <input type="time" id="prod_hora_fin" name="hora_fin" class="form-control form-control-sm" value="23:59">
-                                <small class="text-muted">Ejemplo: 10:00 AM</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Imagen -->
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Fotografía / Imagen (Opcional)</label>
-                        <input type="file" id="prod_imagen_file" name="imagen_file" class="form-control"
-                               accept="image/jpeg,image/png,image/gif,image/webp,image/avif">
-                        <div id="preview_imagen_actual" class="mt-2 d-none">
-                            <span class="small text-muted d-block mb-1">Imagen actual:</span>
-                            <img src="" id="img_preview" class="rounded border" style="max-height: 80px;">
-                        </div>
-                    </div>
-
-                    <!-- Estado Activo -->
-                    <div class="form-check form-switch mb-2">
-                        <input class="form-check-input" type="checkbox" id="prod_estado" name="estado" value="1" checked>
-                        <label class="form-check-label fw-bold" for="prod_estado">
-                            Producto Activo en el Catálogo
-                        </label>
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary fw-bold" id="btnGuardar">Guardar Producto</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <!-- ═══════════════════════════════════════════════════════
      MODAL — REALIZAR RESERVA DIRECTA (ADMINISTRADOR)
@@ -912,28 +899,24 @@ $estilosCategorias = [
         });
     }
 
-    function abrirModalNuevoProducto(categoriaPrevia = '') {
-        document.getElementById('modalTitulo').textContent = '➕ Nuevo Producto para La Carta';
-        document.getElementById('prod_id').value = '0';
-        document.getElementById('prod_nombre').value = '';
-        document.getElementById('prod_descripcion').value = '';
-        document.getElementById('prod_precio').value = '';
-        document.getElementById('prod_stock').value = '10';
-        document.getElementById('prod_dias_habilitados').value = 'Todos';
-        document.getElementById('prod_fecha_habilitacion').value = '';
-        document.getElementById('prod_hora_inicio').value = '00:00';
-        document.getElementById('prod_hora_fin').value = '23:59';
-        document.getElementById('prod_imagen_file').value = '';
-        document.getElementById('prod_estado').checked = true;
-        document.getElementById('preview_imagen_actual').classList.add('d-none');
-
-        if (categoriaPrevia) {
-            document.getElementById('prod_categoria').value = categoriaPrevia;
-        } else {
-            document.getElementById('prod_categoria').value = '';
+    function seleccionarCategoriaEnFormulario(categoria = '') {
+        cancelarEdicionProducto();
+        if (categoria) {
+            const catSelect = document.getElementById('prod_categoria');
+            if (catSelect) catSelect.value = categoria;
         }
+        const lateral = document.getElementById('cardFormularioLateral');
+        if (lateral) {
+            lateral.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        const inputNombre = document.getElementById('prod_nombre');
+        if (inputNombre) {
+            setTimeout(() => inputNombre.focus(), 300);
+        }
+    }
 
-        new bootstrap.Modal(document.getElementById('modalProducto')).show();
+    function abrirModalNuevoProducto(categoriaPrevia = '') {
+        seleccionarCategoriaEnFormulario(categoriaPrevia);
     }
 
     function abrirModalEditarProducto(id) {
@@ -943,7 +926,21 @@ $estilosCategorias = [
                 return res.json();
             })
             .then(data => {
-                document.getElementById('modalTitulo').textContent = '✏️ Editar Producto: ' + data.nombre;
+                // Actualizar encabezado del formulario lateral
+                const titulo = document.getElementById('panelFormTitulo');
+                if (titulo) titulo.innerHTML = '✏️ Editar Producto';
+
+                const badge = document.getElementById('badgeModoForm');
+                if (badge) {
+                    badge.className = 'badge bg-warning text-dark small shadow-sm';
+                    badge.textContent = 'Edición';
+                }
+
+                const header = document.getElementById('panelFormHeader');
+                if (header) {
+                    header.style.setProperty('background', 'linear-gradient(135deg, #b45309 0%, #d97706 100%)', 'important');
+                }
+
                 document.getElementById('prod_id').value = data.id;
                 document.getElementById('prod_categoria').value = data.categoria;
                 document.getElementById('prod_nombre').value = data.nombre;
@@ -966,11 +963,72 @@ $estilosCategorias = [
                     previewBox.classList.add('d-none');
                 }
 
-                new bootstrap.Modal(document.getElementById('modalProducto')).show();
+                const btnGuardar = document.getElementById('btnGuardar');
+                if (btnGuardar) {
+                    btnGuardar.innerHTML = '💾 Actualizar Producto';
+                    btnGuardar.className = 'btn btn-warning text-dark w-100 fw-bold py-2 shadow-sm';
+                }
+
+                const btnCancel = document.getElementById('btnCancelarEdicion');
+                if (btnCancel) {
+                    btnCancel.classList.remove('d-none');
+                }
+
+                const lateral = document.getElementById('cardFormularioLateral');
+                if (lateral) {
+                    lateral.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                const inputNombre = document.getElementById('prod_nombre');
+                if (inputNombre) {
+                    setTimeout(() => inputNombre.focus(), 300);
+                }
             })
             .catch(err => {
                 alert('Error al obtener la información del producto.');
             });
+    }
+
+    function cancelarEdicionProducto() {
+        document.getElementById('prod_id').value = '0';
+        document.getElementById('prod_categoria').value = '';
+        document.getElementById('prod_nombre').value = '';
+        document.getElementById('prod_descripcion').value = '';
+        document.getElementById('prod_precio').value = '';
+        document.getElementById('prod_stock').value = '10';
+        document.getElementById('prod_dias_habilitados').value = 'Todos';
+        document.getElementById('prod_fecha_habilitacion').value = '';
+        document.getElementById('prod_hora_inicio').value = '00:00';
+        document.getElementById('prod_hora_fin').value = '23:59';
+        document.getElementById('prod_imagen_file').value = '';
+        document.getElementById('prod_estado').checked = true;
+
+        const previewBox = document.getElementById('preview_imagen_actual');
+        if (previewBox) previewBox.classList.add('d-none');
+
+        const titulo = document.getElementById('panelFormTitulo');
+        if (titulo) titulo.innerHTML = '➕ Registrar Producto';
+
+        const badge = document.getElementById('badgeModoForm');
+        if (badge) {
+            badge.className = 'badge bg-white text-success small shadow-sm';
+            badge.textContent = 'Nuevo';
+        }
+
+        const header = document.getElementById('panelFormHeader');
+        if (header) {
+            header.style.setProperty('background', 'linear-gradient(135deg, #15803d 0%, #16a34a 100%)', 'important');
+        }
+
+        const btnGuardar = document.getElementById('btnGuardar');
+        if (btnGuardar) {
+            btnGuardar.innerHTML = '💾 Guardar Producto';
+            btnGuardar.className = 'btn btn-success w-100 fw-bold py-2 shadow-sm';
+        }
+
+        const btnCancel = document.getElementById('btnCancelarEdicion');
+        if (btnCancel) {
+            btnCancel.classList.add('d-none');
+        }
     }
 
     function cambiarEstadoProducto(id, activo, switchElem) {

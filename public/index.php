@@ -32,6 +32,7 @@ require_once ROOT_PATH . '/services/AuthService.php';
 require_once ROOT_PATH . '/services/AdminService.php';
 require_once ROOT_PATH . '/services/CocinaService.php';
 require_once ROOT_PATH . '/services/EmpleadoService.php';
+require_once ROOT_PATH . '/services/AnuncioService.php';
 
 // El router carga los demás controladores bajo demanda; Home se deja disponible
 // para resolver la ruta raíz sin depender del orden de las URL.

@@ -109,19 +109,19 @@
 
     </div>
 
-    <!-- TARJETAS USUARIOS + LA CARTA CON COLORES LLAMATIVOS -->
+    <!-- TARJETAS USUARIOS + LA CARTA + ANUNCIOS CON COLORES LLAMATIVOS -->
     <div class="row g-3 g-md-4 mb-4">
         <!-- Usuarios del Sistema (Azul Marino Oscuro Pizarra) -->
-        <div class="col-md-6">
+        <div class="col-lg-4 col-md-6">
             <div class="card shadow rounded-3 p-3 h-100 text-white"
                  style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 2.5px solid #334155 !important;">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
-                        <span class="badge bg-warning text-dark mb-2 fw-bold text-uppercase shadow-sm">👥 Usuarios del Sistema</span>
+                        <span class="badge bg-warning text-dark mb-2 fw-bold text-uppercase shadow-sm">👥 Usuarios</span>
                         <h5 class="fw-bold text-white mt-1 mb-0">
-                            <?= (int)$usuarios_con_reserva ?> con reserva hoy <span class="text-white-50 fs-6">/ <?= (int)$total_usuarios ?> registrados</span>
+                            <?= (int)$usuarios_con_reserva ?> con reserva hoy
                         </h5>
-                        <small class="text-white-50">Gestión de roles y accesos al restaurante</small>
+                        <small class="text-white-50">Roles y accesos al restaurante</small>
                     </div>
                     <a href="<?= BASE_URL ?>/admin/usuarios" class="btn btn-warning text-dark fw-bold btn-sm shadow">
                         Ver Usuarios →
@@ -130,17 +130,33 @@
             </div>
         </div>
         <!-- Acceso directo a La Carta (Azul Zafiro Brillante) -->
-        <div class="col-md-6">
+        <div class="col-lg-4 col-md-6">
             <div class="card shadow rounded-3 p-3 h-100 text-white"
                  style="background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%); border: 2.5px solid #1e40af !important;">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
-                        <span class="badge bg-white text-primary mb-2 fw-bold text-uppercase shadow-sm">📖 Módulo La Carta</span>
-                        <h5 class="fw-bold text-white mt-1 mb-0">Catálogo General y Recuento Consolidado</h5>
-                        <small class="text-white-50">Entradas, platos fuertes, bebidas y postres</small>
+                        <span class="badge bg-white text-primary mb-2 fw-bold text-uppercase shadow-sm">📖 La Carta</span>
+                        <h5 class="fw-bold text-white mt-1 mb-0">Catálogo y Reservas</h5>
+                        <small class="text-white-50">Entradas, platos, bebidas y postres</small>
                     </div>
                     <a href="<?= BASE_URL ?>/carta/admin" class="btn btn-light text-primary fw-bold btn-sm shadow">
                         Administrar →
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!-- Acceso directo a Anuncios (Verde Esmeralda Brillante) -->
+        <div class="col-lg-4 col-md-12">
+            <div class="card shadow rounded-3 p-3 h-100 text-white"
+                 style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border: 2.5px solid #047857 !important;">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <span class="badge bg-white text-success mb-2 fw-bold text-uppercase shadow-sm">📢 Anuncios Login</span>
+                        <h5 class="fw-bold text-white mt-1 mb-0">Avisos Informativos</h5>
+                        <small class="text-white-50">Gestiona alertas en la pantalla de inicio</small>
+                    </div>
+                    <a href="<?= BASE_URL ?>/admin/anuncios" class="btn btn-light text-success fw-bold btn-sm shadow">
+                        Gestionar →
                     </a>
                 </div>
             </div>

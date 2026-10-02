@@ -105,6 +105,12 @@
                                     <i class="bi bi-book-half"></i> La Carta
                                 </a>
                             </li>
+                            <!-- Gestión de Anuncios Informativos del Login -->
+                            <li class="nav-item">
+                                <a class="nav-btn" href="<?= BASE_URL ?>/admin/anuncios">
+                                    <i class="bi bi-megaphone-fill"></i> Anuncios
+                                </a>
+                            </li>
 
                         <?php elseif (Auth::role() === 'Cocina'): ?>
                             <li class="nav-item">

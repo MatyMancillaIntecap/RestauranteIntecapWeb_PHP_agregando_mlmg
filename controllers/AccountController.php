@@ -7,14 +7,20 @@
  */
 declare(strict_types=1);
 
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../services/AuthService.php';
+require_once __DIR__ . '/../services/AnuncioService.php';
+
 class AccountController extends Controller
 {
     private AuthService $authService;
+    private AnuncioService $anuncioService;
 
-    /** Construye el servicio que contiene la logica de autenticacion. */
+    /** Construye el servicio que contiene la logica de autenticacion y anuncios. */
     public function __construct()
     {
         $this->authService = new AuthService();
+        $this->anuncioService = new AnuncioService();
     }
 
     // GET /account/login
@@ -26,20 +32,30 @@ class AccountController extends Controller
             return;
         }
 
+        $anunciosActivos = $this->anuncioService->obtenerAnunciosActivos();
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = trim((string) $this->input('email', ''));
             $password = (string) $this->input('password', '');
             $recordarme = (bool) $this->input('recordarme', false);
 
             if ($email === '' || $password === '') {
-                $this->render('account/login', ['error' => 'Debe ingresar correo y contraseña.', 'email' => $email], false);
+                $this->render('account/login', [
+                    'error'    => 'Debe ingresar correo y contraseña.',
+                    'email'    => $email,
+                    'anuncios' => $anunciosActivos,
+                ], false);
                 return;
             }
 
             [$exito, $mensaje, $usuario] = $this->authService->validarCredenciales($email, $password);
 
             if (!$exito || $usuario === null) {
-                $this->render('account/login', ['error' => $mensaje, 'email' => $email], false);
+                $this->render('account/login', [
+                    'error'    => $mensaje,
+                    'email'    => $email,
+                    'anuncios' => $anunciosActivos,
+                ], false);
                 return;
             }
 
@@ -60,7 +76,11 @@ class AccountController extends Controller
             return;
         }
 
-        $this->render('account/login', ['error' => null, 'email' => ''], false);
+        $this->render('account/login', [
+            'error'    => null,
+            'email'    => '',
+            'anuncios' => $anunciosActivos,
+        ], false);
     }
 
     // GET /account/logout

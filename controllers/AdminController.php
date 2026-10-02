@@ -13,12 +13,14 @@ require_once __DIR__ . '/../services/CocinaService.php';
 require_once __DIR__ . '/../services/EmpleadoService.php';
 require_once __DIR__ . '/../services/ExcelWriter.php';
 require_once __DIR__ . '/../services/PdfWriter.php';
+require_once __DIR__ . '/../services/AnuncioService.php';
 
 class AdminController extends Controller
 {
     private AdminService $adminService;
     private CocinaService $cocinaService;
     private EmpleadoService $empleadoService;
+    private AnuncioService $anuncioService;
 
     /** Verifica el rol administrador e inicializa los servicios requeridos. */
     public function __construct()
@@ -27,6 +29,7 @@ class AdminController extends Controller
         $this->adminService = new AdminService();
         $this->cocinaService = new CocinaService();
         $this->empleadoService = new EmpleadoService();
+        $this->anuncioService = new AnuncioService();
     }
 
     // GET /admin/index
@@ -182,6 +185,112 @@ class AdminController extends Controller
     {
         $id = (int) $this->input('id', 0);
         [$exito, $mensaje] = $this->adminService->eliminarUsuario($id, Auth::id());
+
+        if (!$exito) {
+            $this->json(['error' => $mensaje], 400);
+            return;
+        }
+
+        $this->json(['ok' => true, 'mensaje' => $mensaje]);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // GESTIÓN DE ANUNCIOS (PANTALLA DE INICIO / LOGIN)
+    // ═══════════════════════════════════════════════════════
+
+    // GET /admin/anuncios
+    /** Muestra el panel de control de anuncios y sus estados (activo, programado, vencido, inactivo). */
+    public function anuncios(): void
+    {
+        $anuncios = $this->anuncioService->obtenerTodos();
+
+        $totales = [
+            'total'       => count($anuncios),
+            'activos'     => 0,
+            'programados' => 0,
+            'vencidos'    => 0,
+            'inactivos'   => 0,
+        ];
+
+        foreach ($anuncios as $a) {
+            $estado = $a['estado_calculado'] ?? 'inactivo';
+            if ($estado === 'activo') {
+                $totales['activos']++;
+            } elseif ($estado === 'programado') {
+                $totales['programados']++;
+            } elseif ($estado === 'vencido') {
+                $totales['vencidos']++;
+            } else {
+                $totales['inactivos']++;
+            }
+        }
+
+        $this->render('admin/anuncios', [
+            'anuncios' => $anuncios,
+            'totales'  => $totales,
+            'presets'  => AnuncioService::PRESETS,
+        ]);
+    }
+
+    // GET /admin/obtener-anuncio-por-id/{id} (JSON para edición)
+    /** Devuelve la información de un anuncio por ID para el formulario de edición. */
+    public function obtenerAnuncioPorId($id = null): void
+    {
+        $anuncio = $this->anuncioService->obtenerPorId((int) $id);
+        if ($anuncio === null) {
+            $this->json(['error' => 'Anuncio no encontrado'], 404);
+            return;
+        }
+        $this->json($anuncio);
+    }
+
+    // POST /admin/guardar-anuncio
+    /** Valida y guarda un anuncio nuevo o existente. */
+    public function guardarAnuncio(): void
+    {
+        $dto = [
+            'id'           => (int) $this->input('id', 0),
+            'titulo'       => trim((string) $this->input('titulo', '')),
+            'tipo'         => trim((string) $this->input('tipo', 'Personalizar')),
+            'mensaje'      => trim((string) $this->input('mensaje', '')),
+            'fecha_inicio' => trim((string) $this->input('fecha_inicio', '')),
+            'fecha_fin'    => trim((string) $this->input('fecha_fin', '')),
+            'activo'       => $this->input('activo') !== null,
+        ];
+
+        [$exito, $mensaje, $guardadoId] = $this->anuncioService->guardar($dto);
+
+        if (!$exito) {
+            $this->flash('error', $mensaje);
+        } else {
+            $this->flash('exito', $mensaje);
+        }
+
+        $this->redirect('admin/anuncios');
+    }
+
+    // POST /admin/cambiar-estado-anuncio
+    /** Activa o desactiva un anuncio inmediatamente vía AJAX. */
+    public function cambiarEstadoAnuncio(): void
+    {
+        $id = (int) $this->input('id', 0);
+        $activo = (bool) $this->input('activo', false);
+
+        $resultado = $this->anuncioService->cambiarEstado($id, $activo);
+        if (!$resultado) {
+            $this->json(['error' => 'No se pudo actualizar el estado del anuncio'], 400);
+            return;
+        }
+
+        $this->json(['ok' => true]);
+    }
+
+    // POST /admin/eliminar-anuncio
+    /** Elimina un anuncio del sistema. */
+    public function eliminarAnuncio(): void
+    {
+        $id = (int) $this->input('id', 0);
+        [$exito, $mensaje] = $this->anuncioService->eliminar($id);
 
         if (!$exito) {
             $this->json(['error' => $mensaje], 400);
